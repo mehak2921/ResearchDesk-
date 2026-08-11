@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Research Desk</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/static/style.css?v=19">
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- html2pdf for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- html2canvas for Image generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="ambient-background">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+    
+    <!-- Auth Overlay -->
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-container glass-panel">
+            <h2 id="auth-title">Welcome Back</h2>
+            <p id="auth-subtitle">Login to access your research agent.</p>
+            
+            <form id="auth-form" class="auth-form">
+                <div class="input-group">
+                    <i class="ph ph-envelope"></i>
+                    <input type="email" id="auth-email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group" id="password-group">
+                    <i class="ph ph-lock-key"></i>
+                    <input type="password" id="auth-password" placeholder="Password" required>
+                </div>
+                
+                <button type="submit" id="auth-submit-btn" class="glow-btn full-width">
+                    <span class="btn-text">Login</span>
+                </button>
+            </form>
+            
+            <div class="auth-links">
+                <a href="#" id="toggle-auth-mode">Need an account? Register</a>
+                <a href="#" id="forgot-password-link">Forgot Password?</a>
+            </div>
+            <div id="auth-error" class="auth-error hidden"></div>
+            <div id="auth-success" class="auth-success hidden"></div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="profile-modal" class="auth-overlay hidden">
+        <div class="auth-container glass-panel">
+            <h2>Edit Profile</h2>
+            <p>Update your password</p>
+            <form id="profile-form" class="auth-form">
+                <div class="input-group">
+                    <i class="ph ph-lock-key"></i>
+                    <input type="password" id="new-password" placeholder="New Password" required>
+                </div>
+                <button type="submit" class="glow-btn full-width">
+                    <span class="btn-text">Update Password</span>
+                </button>
+                <button type="button" id="close-profile-btn" class="action-btn full-width mt-2" style="justify-content: center;">
+                    Cancel
+                </button>
+            </form>
+            <div id="profile-message" class="mt-2 text-center"></div>
+        </div>
+    </div>
+    
+    <div class="layout">
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <h3><i class="ph-fill ph-clock-counter-clockwise"></i> History</h3>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="new-chat-btn" class="icon-btn primary-icon-btn" title="New Research">
+                        <i class="ph ph-plus"></i> <span class="desktop-only">New</span>
+                    </button>
+                    <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="history-empty">
+                    <i class="ph ph-empty-state" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                    <p>No past research found.</p>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info" id="user-profile-btn" title="Profile Settings" style="cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; margin-left: -0.5rem; margin-right: -0.5rem;">
+                    <i class="ph-fill ph-user-circle"></i>
+                    <span id="user-email-display">user@example.com</span>
+                </div>
+                <div id="user-actions-container" class="user-actions hidden" style="margin-top: 0.25rem;">
+                    <button id="edit-profile-btn" class="icon-btn primary-icon-btn" title="Edit Profile">
+                        <i class="ph ph-pencil-simple"></i> Edit
+                    </button>
+                    <button id="logout-btn" class="icon-btn primary-icon-btn" title="Logout" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #fca5a5;">
+                        <i class="ph ph-sign-out"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="container">
+            <header class="app-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <button id="mobile-menu-btn" class="icon-btn mobile-only" title="Menu" style="margin-right: 1rem;">
+                        <i class="ph ph-list" style="font-size: 1.5rem;"></i>
+                    </button>
+                    <div class="title-wrapper" style="margin: 0; flex: 1; text-align: center;">
+                        <h1>The Research Desk</h1>
+                    </div>
+                    <div class="mobile-spacer" style="width: 40px;" class="mobile-only"></div>
+                </div>
+                <p style="text-align: center;">Powered by <span class="highlight">CrewAI</span></p>
+            </header>
+            
+            <main class="main-content">
+                <div class="search-container glass-panel">
+                    <form id="research-form">
+                        <div class="input-wrapper">
+                            <i class="ph ph-magnifying-glass search-icon"></i>
+                            <textarea id="topic-input" placeholder="What would you like to research today?" required autocomplete="off" rows="1"></textarea>
+                            <button type="button" class="mic-btn" id="mic-main" title="Voice Input"><i class="ph ph-microphone"></i></button>
+                            <div class="custom-placeholder mobile-only">What would you like to<br>research today?</div>
+                            <div class="focus-ring"></div>
+                        </div>
+                        <button type="submit" id="submit-btn" class="glow-btn">
+                            <span class="btn-text">Research</span>
+                            <i class="ph-fill ph-sparkle btn-icon"></i>
+                            <div class="spinner hidden"></div>
+                        </button>
+                    </form>
+                    <!-- Clarification Options Container -->
+                    <div id="clarification-container" class="hidden" style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                        <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                            <i class="ph-fill ph-warning-circle" style="color: #f59e0b;"></i> This query is a bit ambiguous. Did you mean:
+                        </p>
+                        <div id="clarification-options" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem;">
+                            <div style="flex: 1; position: relative; display: flex; align-items: center;">
+                                <input type="text" id="custom-clarification-input" placeholder="Or type your own explanation..." autocomplete="off" style="width: 100%; padding: 0.6rem 2.5rem 0.6rem 1rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                                <button type="button" class="mic-btn" id="mic-custom" title="Voice Input"><i class="ph ph-microphone"></i></button>
+                            </div>
+                            <button type="button" id="custom-clarification-btn" class="clarification-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd;">Search</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="loading-state" class="hidden">
+                    <div class="loading-content glass-panel">
+                        <div class="modern-spinner">
+                            <div class="ring ring-1"></div>
+                            <div class="ring ring-2"></div>
+                            <div class="ring ring-3"></div>
+                            <i class="ph-fill ph-brain inner-icon"></i>
+                        </div>
+                        <h3 id="loading-text" class="loading-text">Deploying AI Agents...</h3>
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                        <p class="loading-subtext">This might take a minute depending on the topic complexity.</p>
+                    </div>
+                </div>
+                
+                <div id="result-container" class="glass-panel hidden">
+                    <div class="result-header">
+                        <div class="result-title-group">
+                            <i class="ph-fill ph-file-text title-icon"></i>
+                            <h2 id="report-title">Research Report</h2>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="undo-btn" class="action-btn hidden" title="Undo Revision"><i class="ph ph-arrow-u-up-left"></i> Undo</button>
+                            <button id="redo-btn" class="action-btn hidden" title="Redo Revision"><i class="ph ph-arrow-u-up-right"></i> Redo</button>
+                            <button id="speak-btn" class="action-btn" title="Read aloud"><i class="ph-fill ph-speaker-high"></i> Speak</button>
+                            <button id="download-pdf-btn" class="action-btn" title="Download as PDF"><i class="ph-fill ph-file-pdf"></i> PDF</button>
+                            <button id="download-doc-btn" class="action-btn" title="Download as Word Doc"><i class="ph-fill ph-file-doc"></i> DOC</button>
+                            <button id="download-img-btn" class="action-btn" title="Download as Image"><i class="ph-fill ph-image"></i> IMG</button>
+                            <button id="copy-btn" class="action-btn" title="Copy to clipboard"><i class="ph-fill ph-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div id="report-content" class="markdown-body"></div>
+                    
+                    <!-- Revision Feedback Bar -->
+                    <div id="revision-container" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                        <form id="revision-form" style="display: flex; gap: 0.75rem;">
+                            <div class="input-wrapper" style="flex: 1; border-radius: 8px; position: relative;">
+                                <i class="ph ph-chat-text search-icon"></i>
+                                <input type="text" id="revision-input" placeholder="Want to change anything? Ask here..." required autocomplete="off" style="padding: 0 2.5rem 0 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; border-radius: 8px; height: 3rem; outline: none; transition: all 0.3s;">
+                                <button type="button" class="mic-btn" id="mic-revision" title="Voice Input"><i class="ph ph-microphone"></i></button>
+                            </div>
+                            <button type="submit" id="revise-btn" class="glow-btn" style="padding: 0 1.5rem; border-radius: 8px;">
+                                <span class="btn-text">Revise</span>
+                                <i class="ph-fill ph-paper-plane-right btn-icon"></i>
+                                <div class="spinner hidden"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=20"></script>
+</body>
+</html>
