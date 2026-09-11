@@ -79,7 +79,7 @@ lance-namespace-urllib3-client==0.9.0
 lancedb==0.30.0
 lark==1.3.1
 linkify-it-py==2.1.0
-litellm==1.60.2
+litellm>=1.84.0
 lxml==6.1.1
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
@@ -190,4 +190,4 @@ youtube-transcript-api==1.2.4
 zipp==4.1.0
 
 
-httpx<0.28.0
+httpx>=0.28.1,<0.29.0
