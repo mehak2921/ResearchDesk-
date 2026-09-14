@@ -472,8 +472,11 @@ async def get_history(user_id: str = Depends(get_current_user)):
         print(error_message)
         return {"data": [], "error": error_message}
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files (guarded — Vercel serves these via CDN, directory may not exist in serverless)
+try:
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+except RuntimeError:
+    pass  # static/ not present in serverless environment; Vercel CDN handles it
 
 @app.delete("/api/history/{item_id}")
 async def delete_history(item_id: str, user_id: str = Depends(get_current_user)):
@@ -492,7 +495,9 @@ async def delete_history(item_id: str, user_id: str = Depends(get_current_user))
 
 @app.get("/")
 async def root():
-    return FileResponse("static/index.html")
+    if os.path.exists("static/index.html"):
+        return FileResponse("static/index.html")
+    return {"status": "ok", "message": "ResearchDesk API is running"}
 
 if __name__ == "__main__":
     import uvicorn
