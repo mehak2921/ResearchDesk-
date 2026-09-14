@@ -488,7 +488,7 @@ async def delete_history(item_id: str, user_id: str = Depends(get_current_user))
         print(error_message)
         raise HTTPException(status_code=500, detail=error_message)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 @app.get("/")
 async def root():
