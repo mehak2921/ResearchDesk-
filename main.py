@@ -21,7 +21,38 @@ if sys.stdout.encoding != 'utf-8':
 
 from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, LLM
-from crewai_tools import SerperDevTool
+from crewai.tools import BaseTool
+from typing import Type
+from pydantic import Field
+
+# Lightweight SerperDevTool — replaces crewai-tools to avoid 300MB+ of unused deps
+class SerperSearchInput(BaseModel):
+    query: str = Field(description="Search query to look up on the internet")
+
+class SerperDevTool(BaseTool):
+    name: str = "Internet Search"
+    description: str = "Search the internet for current, accurate information about any topic"
+    args_schema: Type[BaseModel] = SerperSearchInput
+
+    def _run(self, query: str) -> str:
+        import httpx
+        api_key = os.environ.get("SERPER_API_KEY", "")
+        if not api_key:
+            return "Error: SERPER_API_KEY not set"
+        try:
+            resp = httpx.post(
+                "https://google.serper.dev/search",
+                headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+                json={"q": query, "num": 10},
+                timeout=30,
+            )
+            data = resp.json()
+            results = []
+            for r in data.get("organic", [])[:8]:
+                results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
+            return "\n\n".join(results) or "No results found"
+        except Exception as e:
+            return f"Search error: {e}"
 import crewai.llms.cache as _crewai_cache
 
 _crewai_cache.mark_cache_breakpoint = lambda msg: msg

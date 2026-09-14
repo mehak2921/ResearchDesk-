@@ -10,7 +10,6 @@ dependencies = [
     "redis==8.1.0",
     "supabase==2.31.0",
     "crewai==1.15.9",
-    "crewai-tools==1.15.9",
     "crewai-core==1.15.9",
     "pydantic==2.12.5",
     "httpx==0.28.1",

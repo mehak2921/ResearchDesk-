@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "excludeFiles": "**/onnxruntime/**,**/chromadb/**,**/lancedb/**,**/lance_namespace/**,**/huggingface_hub/**,**/tokenizers/**,**/kubernetes/**,**/pyarrow/**,**/hf_xet/**"
+      }
     },
     {
       "src": "static/**",
