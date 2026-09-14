@@ -190,4 +190,4 @@ youtube-transcript-api==1.2.4
 zipp==4.1.0
 
 
-httpx>=0.28.1,<0.29.0
+httpx==0.28.1
