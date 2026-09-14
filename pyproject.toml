@@ -1,1 +1,2 @@
+[tool.uv]
 override-dependencies = ["httpx>=0.28.1,<0.29"]
