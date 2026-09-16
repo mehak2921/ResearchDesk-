@@ -248,8 +248,15 @@ def get_last_messages(conversation_id: str, limit: int = CONTEXT_MESSAGES_LIMIT)
         print(f"Error getting messages: {e}")
         return []
 
+@app.get("/api/models")
+def list_models():
+    import httpx
+    api_key = os.environ.get("GROQ_API_KEY")
+    resp = httpx.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {api_key}"})
+    return resp.json()
+
 # --- Existing Endpoints ---
-def call_groq(messages: list, model: str = "llama-3.3-70b-versatile") -> str:
+def call_groq(messages: list, model: str = "llama3-70b-8192") -> str:
     import httpx
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -266,6 +273,11 @@ def call_groq(messages: list, model: str = "llama-3.3-70b-versatile") -> str:
             },
             timeout=60.0
         )
+        if resp.status_code >= 400:
+            error_msg = f"Groq API Error {resp.status_code}: {resp.text}"
+            print(error_msg)
+            raise Exception(error_msg)
+            
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
