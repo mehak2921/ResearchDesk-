@@ -331,10 +331,10 @@ def run_crewai(topic: str, context_messages: list = None):
         return final_article
 
     try:
-        return execute("llama-3.3-70b-versatile")
+        return execute("llama3-70b-8192")
     except Exception as e:
         print(f"Primary model failed in run_crewai: {e}. Retrying with fallback.")
-        return execute("llama-3.1-8b-instant")
+        return execute("llama3-8b-8192")
 
 def run_clarification_check(topic: str):
     def execute(model_name):
@@ -353,11 +353,11 @@ def run_clarification_check(topic: str):
         return json.loads(result.strip())
         
     try:
-        return execute("llama-3.3-70b-versatile")
+        return execute("llama3-70b-8192")
     except Exception as e:
         print(f"Primary model failed in run_clarification_check: {e}. Retrying with fallback.")
         try:
-            return execute("llama-3.1-8b-instant")
+            return execute("llama3-8b-8192")
         except Exception:
             return {"status": "clear"} # fallback
 
@@ -374,10 +374,10 @@ def run_revision(topic: str, current_report: str, feedback: str):
         return call_groq([{"role": "user", "content": editor_prompt}], model=model_name)
         
     try:
-        return execute("llama-3.3-70b-versatile")
+        return execute("llama3-70b-8192")
     except Exception as e:
         print(f"Primary model failed in run_revision: {e}. Retrying with fallback.")
-        return execute("llama-3.1-8b-instant")
+        return execute("llama3-8b-8192")
 
 @app.post("/api/research")
 async def research_topic(request: ResearchRequest, user_id: str = Depends(get_current_user)):
