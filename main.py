@@ -59,6 +59,30 @@ for _m in ['chromadb', 'chromadb.config', 'chromadb.api', 'chromadb.api.types',
               HttpClient=_Stub, AsyncHttpClient=_Stub, Client=_Stub,
               Settings=_Stub, Collection=_Stub, configure=lambda **kw: None,
               DEFAULT_TENANT='default_tenant', DEFAULT_DATABASE='default_database')
+
+# tokenizers (Rust compiled — crashes Lambda)
+for _m in ['tokenizers', 'tokenizers.implementations', 'tokenizers.models',
+           'tokenizers.pre_tokenizers', 'tokenizers.decoders', 'tokenizers.processors']:
+    _stub_pkg(_m, Tokenizer=_Stub, Encoding=_Stub, AddedToken=_Stub)
+
+# lancedb + lance (compiled Arrow/Rust extensions)
+for _m in ['lancedb', 'lancedb.table', 'lancedb.index', 'lancedb.query',
+           'lance', 'lance.dataset', 'lance_namespace', 'lance_namespace_urllib3_client']:
+    _stub_pkg(_m, connect=_Stub, LanceDataset=_Stub, LanceTable=_Stub)
+
+# pyarrow (C extension — may be pulled in by lancedb)
+for _m in ['pyarrow', 'pyarrow.lib', 'pyarrow.compute', 'pyarrow.fs']:
+    _stub_pkg(_m, Table=_Stub, Schema=_Stub, array=_Stub(), field=_Stub(),
+              int64=_Stub(), float32=_Stub(), string=_Stub(), list_=_Stub())
+
+# grpcio (C extension — pulled in by chromadb/opentelemetry)
+for _m in ['grpc', 'grpc._channel', 'grpc.aio']:
+    _stub_pkg(_m, Channel=_Stub, insecure_channel=_Stub, secure_channel=_Stub,
+              ssl_channel_credentials=_Stub)
+
+# kubernetes client (pulled in by chromadb)
+for _m in ['kubernetes', 'kubernetes.client', 'kubernetes.config']:
+    _stub_pkg(_m, client=_Stub, config=_Stub)
 # ── End stubs ────────────────────────────────────────────────────────────────
 
 from crewai import Agent, Task, Crew, LLM
