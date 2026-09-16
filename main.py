@@ -86,8 +86,15 @@ supabase_key_ref = supabase_key_payload.get("ref")
 supabase_project_ref = get_supabase_project_ref(supabase_url)
 supabase: Client | None = None
 
+from supabase.client import ClientOptions
+from gotrue.helpers import SyncMemoryStorage
+
 if supabase_url and supabase_key:
-    supabase = create_client(supabase_url, supabase_key)
+    supabase = create_client(
+        supabase_url, 
+        supabase_key, 
+        options=ClientOptions(storage=SyncMemoryStorage())
+    )
     print("Supabase client initialized.")
 else:
     print("Warning: SUPABASE_URL or SUPABASE_KEY not found in environment. History will not be saved.")
@@ -152,7 +159,7 @@ def get_current_user(authorization: str = Header(None)):
 
 # --- Auth Endpoints ---
 @app.post("/api/auth/register")
-async def register(request: AuthRequest):
+def register(request: AuthRequest):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     try:
@@ -165,7 +172,7 @@ async def register(request: AuthRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/auth/login")
-async def login(request: AuthRequest):
+def login(request: AuthRequest):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     try:
@@ -178,7 +185,7 @@ async def login(request: AuthRequest):
         raise HTTPException(status_code=401, detail=str(e))
 
 @app.post("/api/auth/reset-password")
-async def reset_password(request: ResetPasswordRequest):
+def reset_password(request: ResetPasswordRequest):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     try:
@@ -188,7 +195,7 @@ async def reset_password(request: ResetPasswordRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/auth/update-password")
-async def update_password(request: UpdatePasswordRequest, user_id: str = Depends(get_current_user)):
+def update_password(request: UpdatePasswordRequest, user_id: str = Depends(get_current_user)):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     try:
