@@ -87,7 +87,7 @@ supabase_project_ref = get_supabase_project_ref(supabase_url)
 supabase: Client | None = None
 
 from supabase.client import ClientOptions
-from gotrue.helpers import SyncMemoryStorage
+from supabase_auth import SyncMemoryStorage
 
 if supabase_url and supabase_key:
     supabase = create_client(
