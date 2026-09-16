@@ -31,112 +31,8 @@ print("[STARTUP] importing dotenv...", flush=True)
 from dotenv import load_dotenv
 print("[STARTUP] dotenv OK", flush=True)
 
-# ── Serverless compatibility stubs ──────────────────────────────────────────
-# crewai transitively imports chromadb → onnxruntime (native .so).
-# These compiled extensions crash Vercel's Lambda environment.
-# We stub them in sys.modules BEFORE importing crewai so Python never
-# loads the real packages. Safe because we never use memory=True in Crew().
-import types as _types
-
-class _Stub:
-    """Absorbs any attribute access or call — a safe no-op placeholder."""
-    def __init__(self, *a, **kw): pass
-    def __call__(self, *a, **kw): return _Stub()
-    def __getattr__(self, k): return _Stub()
-    def __iter__(self): return iter([])
-    def __enter__(self): return self
-    def __exit__(self, *a): pass
-    def __bool__(self): return False
-
-def _stub_pkg(name, **attrs):
-    if name not in sys.modules:
-        m = _types.ModuleType(name)
-        m.__dict__.update({k: v for k, v in attrs.items()})
-        sys.modules[name] = m
-
-# onnxruntime and submodules
-for _m in ['onnxruntime', 'onnxruntime.capi', 'onnxruntime.capi._pybind_state',
-           'onnxruntime.backend', 'onnxruntime.tools', 'onnxruntime.quantization']:
-    _stub_pkg(_m, InferenceSession=_Stub, SessionOptions=_Stub,
-              GraphOptimizationLevel=_Stub(), ExecutionMode=_Stub(),
-              OrtValue=_Stub, OrtDevice=_Stub)
-
-# chromadb and submodules
-for _m in ['chromadb', 'chromadb.config', 'chromadb.api', 'chromadb.api.types',
-           'chromadb.types', 'chromadb.db', 'chromadb.errors', 'chromadb.utils',
-           'chromadb.segment', 'chromadb.telemetry', 'chromadb.ingest']:
-    _stub_pkg(_m, EphemeralClient=_Stub, PersistentClient=_Stub,
-              HttpClient=_Stub, AsyncHttpClient=_Stub, Client=_Stub,
-              Settings=_Stub, Collection=_Stub, configure=lambda **kw: None,
-              DEFAULT_TENANT='default_tenant', DEFAULT_DATABASE='default_database')
-
-# tokenizers (Rust compiled — crashes Lambda)
-for _m in ['tokenizers', 'tokenizers.implementations', 'tokenizers.models',
-           'tokenizers.pre_tokenizers', 'tokenizers.decoders', 'tokenizers.processors']:
-    _stub_pkg(_m, Tokenizer=_Stub, Encoding=_Stub, AddedToken=_Stub)
-
-# lancedb + lance (compiled Arrow/Rust extensions)
-for _m in ['lancedb', 'lancedb.table', 'lancedb.index', 'lancedb.query',
-           'lance', 'lance.dataset', 'lance_namespace', 'lance_namespace_urllib3_client']:
-    _stub_pkg(_m, connect=_Stub, LanceDataset=_Stub, LanceTable=_Stub)
-
-# pyarrow (C extension — may be pulled in by lancedb)
-for _m in ['pyarrow', 'pyarrow.lib', 'pyarrow.compute', 'pyarrow.fs']:
-    _stub_pkg(_m, Table=_Stub, Schema=_Stub, array=_Stub(), field=_Stub(),
-              int64=_Stub(), float32=_Stub(), string=_Stub(), list_=_Stub())
-
-# grpcio (C extension — pulled in by chromadb/opentelemetry)
-for _m in ['grpc', 'grpc._channel', 'grpc.aio']:
-    _stub_pkg(_m, Channel=_Stub, insecure_channel=_Stub, secure_channel=_Stub,
-              ssl_channel_credentials=_Stub)
-
-# kubernetes client (pulled in by chromadb)
-for _m in ['kubernetes', 'kubernetes.client', 'kubernetes.config']:
-    _stub_pkg(_m, client=_Stub, config=_Stub)
-# ── End stubs ────────────────────────────────────────────────────────────────
-
-print("[STARTUP] stubs installed, importing crewai...", flush=True)
-from crewai import Agent, Task, Crew, LLM
-print("[STARTUP] crewai Agent/Task/Crew/LLM OK", flush=True)
-from crewai.tools import BaseTool
-print("[STARTUP] crewai.tools OK", flush=True)
-from typing import Type
-from pydantic import Field
-print("[STARTUP] all imports done!", flush=True)
-
-# Lightweight SerperDevTool — replaces crewai-tools to avoid 300MB+ of unused deps
-class SerperSearchInput(BaseModel):
-    query: str = Field(description="Search query to look up on the internet")
-
-class SerperDevTool(BaseTool):
-    name: str = "Internet Search"
-    description: str = "Search the internet for current, accurate information about any topic"
-    args_schema: Type[BaseModel] = SerperSearchInput
-
-    def _run(self, query: str) -> str:
-        import httpx
-        api_key = os.environ.get("SERPER_API_KEY", "")
-        if not api_key:
-            return "Error: SERPER_API_KEY not set"
-        try:
-            resp = httpx.post(
-                "https://google.serper.dev/search",
-                headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
-                json={"q": query, "num": 10},
-                timeout=30,
-            )
-            data = resp.json()
-            results = []
-            for r in data.get("organic", [])[:8]:
-                results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
-            return "\n\n".join(results) or "No results found"
-        except Exception as e:
-            return f"Search error: {e}"
-try:
-    import crewai.llms.cache as _crewai_cache
-    _crewai_cache.mark_cache_breakpoint = lambda msg: msg
-except (ImportError, AttributeError):
-    pass  # crewai internal cache module not available on this platform
+print("[STARTUP] all core imports done! FastAPI ready.", flush=True)
+# crewai is imported lazily inside run_crewai() to avoid native .so crash at startup
 
 load_dotenv()
 
@@ -347,6 +243,43 @@ def get_last_messages(conversation_id: str, limit: int = CONTEXT_MESSAGES_LIMIT)
 
 # --- Existing Endpoints ---
 def run_crewai(topic: str, context_messages: list = None):
+    # ── Lazy import: crewai loads here, NOT at module startup ──
+    # This prevents native .so extensions (onnxruntime, tokenizers, etc.)
+    # from crashing the Lambda before FastAPI even starts.
+    from crewai import Agent, Task, Crew, LLM
+    from crewai.tools import BaseTool
+    from typing import Type
+    from pydantic import Field as _Field
+    import httpx as _httpx
+
+    class _SerperSearchInput(BaseModel):
+        query: str = _Field(description="Search query to look up on the internet")
+
+    class _SerperDevTool(BaseTool):
+        name: str = "Internet Search"
+        description: str = "Search the internet for current, accurate information about any topic"
+        args_schema: Type[BaseModel] = _SerperSearchInput
+
+        def _run(self, query: str) -> str:
+            api_key = os.environ.get("SERPER_API_KEY", "")
+            if not api_key:
+                return "Error: SERPER_API_KEY not set"
+            try:
+                resp = _httpx.post(
+                    "https://google.serper.dev/search",
+                    headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+                    json={"q": query, "num": 10},
+                    timeout=30,
+                )
+                data = resp.json()
+                results = []
+                for r in data.get("organic", [])[:8]:
+                    results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
+                return "\n\n".join(results) or "No results found"
+            except Exception as e:
+                return f"Search error: {e}"
+    # ── End lazy imports ──
+
     context_str = ""
     if context_messages:
         context_str = "Conversation Summary:\n"
@@ -361,7 +294,7 @@ def run_crewai(topic: str, context_messages: list = None):
             model=model_name,
             temperature=0.01
         )
-        search_tool = SerperDevTool()
+        search_tool = _SerperDevTool()
 
         researcher = Agent(
             role="Senior Researcher",
@@ -409,6 +342,7 @@ def run_crewai(topic: str, context_messages: list = None):
         return execute("groq/llama-3.1-8b-instant")
 
 def run_clarification_check(topic: str):
+    from crewai import Agent, Task, Crew, LLM  # lazy import
     def execute(model_name):
         llm = LLM(model=model_name, temperature=0.1)
         evaluator = Agent(
