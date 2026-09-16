@@ -53,9 +53,11 @@ class SerperDevTool(BaseTool):
             return "\n\n".join(results) or "No results found"
         except Exception as e:
             return f"Search error: {e}"
-import crewai.llms.cache as _crewai_cache
-
-_crewai_cache.mark_cache_breakpoint = lambda msg: msg
+try:
+    import crewai.llms.cache as _crewai_cache
+    _crewai_cache.mark_cache_breakpoint = lambda msg: msg
+except (ImportError, AttributeError):
+    pass  # crewai internal cache module not available on this platform
 
 load_dotenv()
 
