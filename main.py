@@ -256,33 +256,45 @@ def list_models():
     return resp.json()
 
 # --- Existing Endpoints ---
-def call_groq(messages: list, model: str = "llama3-70b-8192") -> str:
+def call_groq(messages: list, model: str = None) -> str:
     import httpx
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         return "Error: GROQ_API_KEY not set"
     
-    try:
-        resp = httpx.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={
-                "model": model,
-                "messages": messages,
-                "temperature": 0.01,
-            },
-            timeout=60.0
-        )
-        if resp.status_code >= 400:
-            error_msg = f"Groq API Error {resp.status_code}: {resp.text}"
-            print(error_msg)
-            raise Exception(error_msg)
+    models_to_try = [model] if model else [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it"
+    ]
+    
+    last_error = None
+    for m in models_to_try:
+        try:
+            resp = httpx.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={
+                    "model": m,
+                    "messages": messages,
+                    "temperature": 0.01,
+                },
+                timeout=60.0
+            )
+            if resp.status_code >= 400:
+                last_error = f"Groq API Error {resp.status_code} with {m}: {resp.text}"
+                print(last_error)
+                continue
+                
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            last_error = f"Groq API error with {m}: {e}"
+            print(last_error)
+            continue
             
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
-    except Exception as e:
-        print(f"Groq API error with {model}: {e}")
-        raise e
+    raise Exception(f"All models failed. Last error: {last_error}")
 
 def _run_serper_search(query: str) -> str:
     import httpx
@@ -314,7 +326,7 @@ def run_crewai(topic: str, context_messages: list = None):
             context_str += f"{role_name} {action}\n{msg['content']}\n\n"
         context_str += f"Current Question: {topic}\n\n"
 
-    def execute(model_name):
+    def execute():
         # 1. Search the web
         search_results = _run_serper_search(topic)
 
@@ -328,25 +340,18 @@ def run_crewai(topic: str, context_messages: list = None):
             f"Here are the search results from the web:\n{search_results}\n\n"
             f"Write a structured report containing the most relevant and accurate facts, context, and details about the topic, including a precise list of the raw URLs used as sources."
         )
-        print(f"Running Researcher on {model_name}...")
-        research_report = call_groq([{"role": "user", "content": researcher_prompt}], model=model_name)
+        research_report = call_groq([{"role": "user", "content": researcher_prompt}])
 
         # 3. Writer Agent
         writer_prompt = (
-            f"You are a Versatile Writer, known for adapting your tone to the subject matter.\n"
-            f"Your goal is to write an engaging and highly accurate article based on the provided research.\n\n"
-            f"Here is the research report:\n{research_report}\n\n"
+            f"You are a Versatile Writer, skilled in creating engaging, well-structured, and accurate content.\n"
             f"Write a well-structured, engaging article about '{topic}' based entirely on the researcher's report. Ensure the tone matches the subject matter. You MUST append a 'References' section at the very end citing the specific sources. Every reference MUST be formatted as a clickable Markdown link using the format: [Source Title](URL). Do not just list the titles; you must include the full URL."
+            f"Researcher's Report:\n{research_report}"
         )
-        print(f"Running Writer on {model_name}...")
-        final_article = call_groq([{"role": "user", "content": writer_prompt}], model=model_name)
+        final_article = call_groq([{"role": "user", "content": writer_prompt}])
         return final_article
 
-    try:
-        return execute("llama3-70b-8192")
-    except Exception as e:
-        print(f"Primary model failed in run_crewai: {e}. Retrying with fallback.")
-        return execute("llama3-8b-8192")
+    return execute()
 
 def run_clarification_check(topic: str):
     def execute(model_name):
@@ -356,40 +361,34 @@ def run_clarification_check(topic: str):
             f"Evaluate this query: '{topic}'. If it is highly ambiguous (e.g., a single word with multiple meanings like 'Apple', or gibberish), provide 2-4 specific clarification options. If it is a standard query, return 'CLEAR'. Respond ONLY with valid JSON format: {{\"status\": \"clear\"}} OR {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}"
         )
         result = call_groq([{"role": "user", "content": evaluator_prompt}], model=model_name)
-        
-        # Extract JSON from potential markdown blocks
-        if "```json" in result:
-            result = result.split("```json")[1].split("```")[0]
-        elif "```" in result:
-            result = result.split("```")[1].split("```")[0]
+            f"You are an AI assistant tasked with determining if a user's research topic is clear and actionable.\n"
+            f"Topic: '{topic}'\n\n"
+            f"If the topic is too broad, ambiguous, or lacks context, respond with JSON like this: {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}.\n"
+            f"If the topic is clear, respond with: {{\"status\": \"clear\"}}.\n"
+            f"Output ONLY valid JSON."
+        )
+        result = call_groq([{"role": "user", "content": evaluator_prompt}])
         return json.loads(result.strip())
         
     try:
-        return execute("llama3-70b-8192")
+        return execute()
     except Exception as e:
-        print(f"Primary model failed in run_clarification_check: {e}. Retrying with fallback.")
-        try:
-            return execute("llama3-8b-8192")
-        except Exception:
-            return {"status": "clear"} # fallback
+        print(f"Primary model failed in run_clarification_check: {e}. Returning fallback.")
+        return {"status": "clear"} # fallback
 
 def run_revision(topic: str, current_report: str, feedback: str):
-    def execute(model_name):
+    def execute():
         editor_prompt = (
-            f"You are an Expert Editor. You are a skilled editor who can adapt existing content flawlessly to meet new requirements while retaining accuracy.\n"
+            f"You are an expert Editor.\n"
             f"Your goal is to revise the report based on user feedback.\n\n"
             f"Topic: {topic}\n\n"
             f"Current Report:\n{current_report}\n\n"
             f"User Feedback: {feedback}\n\n"
             f"Rewrite the report to incorporate the user's feedback. Output ONLY the revised markdown content."
         )
-        return call_groq([{"role": "user", "content": editor_prompt}], model=model_name)
+        return call_groq([{"role": "user", "content": editor_prompt}])
         
-    try:
-        return execute("llama3-70b-8192")
-    except Exception as e:
-        print(f"Primary model failed in run_revision: {e}. Retrying with fallback.")
-        return execute("llama3-8b-8192")
+    return execute()
 
 @app.post("/api/research")
 async def research_topic(request: ResearchRequest, user_id: str = Depends(get_current_user)):
