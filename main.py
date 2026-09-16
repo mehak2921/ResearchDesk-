@@ -20,6 +20,47 @@ if sys.stdout.encoding != 'utf-8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from dotenv import load_dotenv
+
+# ── Serverless compatibility stubs ──────────────────────────────────────────
+# crewai transitively imports chromadb → onnxruntime (native .so).
+# These compiled extensions crash Vercel's Lambda environment.
+# We stub them in sys.modules BEFORE importing crewai so Python never
+# loads the real packages. Safe because we never use memory=True in Crew().
+import types as _types
+
+class _Stub:
+    """Absorbs any attribute access or call — a safe no-op placeholder."""
+    def __init__(self, *a, **kw): pass
+    def __call__(self, *a, **kw): return _Stub()
+    def __getattr__(self, k): return _Stub()
+    def __iter__(self): return iter([])
+    def __enter__(self): return self
+    def __exit__(self, *a): pass
+    def __bool__(self): return False
+
+def _stub_pkg(name, **attrs):
+    if name not in sys.modules:
+        m = _types.ModuleType(name)
+        m.__dict__.update({k: v for k, v in attrs.items()})
+        sys.modules[name] = m
+
+# onnxruntime and submodules
+for _m in ['onnxruntime', 'onnxruntime.capi', 'onnxruntime.capi._pybind_state',
+           'onnxruntime.backend', 'onnxruntime.tools', 'onnxruntime.quantization']:
+    _stub_pkg(_m, InferenceSession=_Stub, SessionOptions=_Stub,
+              GraphOptimizationLevel=_Stub(), ExecutionMode=_Stub(),
+              OrtValue=_Stub, OrtDevice=_Stub)
+
+# chromadb and submodules
+for _m in ['chromadb', 'chromadb.config', 'chromadb.api', 'chromadb.api.types',
+           'chromadb.types', 'chromadb.db', 'chromadb.errors', 'chromadb.utils',
+           'chromadb.segment', 'chromadb.telemetry', 'chromadb.ingest']:
+    _stub_pkg(_m, EphemeralClient=_Stub, PersistentClient=_Stub,
+              HttpClient=_Stub, AsyncHttpClient=_Stub, Client=_Stub,
+              Settings=_Stub, Collection=_Stub, configure=lambda **kw: None,
+              DEFAULT_TENANT='default_tenant', DEFAULT_DATABASE='default_database')
+# ── End stubs ────────────────────────────────────────────────────────────────
+
 from crewai import Agent, Task, Crew, LLM
 from crewai.tools import BaseTool
 from typing import Type
