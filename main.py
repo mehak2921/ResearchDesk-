@@ -1,25 +1,35 @@
 import sys
 import io
 import os
+
+print(f"[STARTUP] Python {sys.version}", flush=True)
+print("[STARTUP] importing fastapi...", flush=True)
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+print("[STARTUP] fastapi OK", flush=True)
 import asyncio
 import base64
 import json
+print("[STARTUP] importing redis...", flush=True)
 import redis
+print("[STARTUP] redis OK", flush=True)
 from urllib.parse import urlparse
 
 # Supabase imports
+print("[STARTUP] importing supabase...", flush=True)
 from postgrest.exceptions import APIError
 from supabase import create_client, Client
+print("[STARTUP] supabase OK", flush=True)
 
 if sys.stdout.encoding != 'utf-8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
+print("[STARTUP] importing dotenv...", flush=True)
 from dotenv import load_dotenv
+print("[STARTUP] dotenv OK", flush=True)
 
 # ── Serverless compatibility stubs ──────────────────────────────────────────
 # crewai transitively imports chromadb → onnxruntime (native .so).
@@ -85,10 +95,14 @@ for _m in ['kubernetes', 'kubernetes.client', 'kubernetes.config']:
     _stub_pkg(_m, client=_Stub, config=_Stub)
 # ── End stubs ────────────────────────────────────────────────────────────────
 
+print("[STARTUP] stubs installed, importing crewai...", flush=True)
 from crewai import Agent, Task, Crew, LLM
+print("[STARTUP] crewai Agent/Task/Crew/LLM OK", flush=True)
 from crewai.tools import BaseTool
+print("[STARTUP] crewai.tools OK", flush=True)
 from typing import Type
 from pydantic import Field
+print("[STARTUP] all imports done!", flush=True)
 
 # Lightweight SerperDevTool — replaces crewai-tools to avoid 300MB+ of unused deps
 class SerperSearchInput(BaseModel):
