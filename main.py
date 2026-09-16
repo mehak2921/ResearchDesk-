@@ -242,44 +242,50 @@ def get_last_messages(conversation_id: str, limit: int = CONTEXT_MESSAGES_LIMIT)
         return []
 
 # --- Existing Endpoints ---
+def call_groq(messages: list, model: str = "llama-3.3-70b-versatile") -> str:
+    import httpx
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        return "Error: GROQ_API_KEY not set"
+    
+    try:
+        resp = httpx.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": model,
+                "messages": messages,
+                "temperature": 0.01,
+            },
+            timeout=60.0
+        )
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        print(f"Groq API error with {model}: {e}")
+        raise e
+
+def _run_serper_search(query: str) -> str:
+    import httpx
+    api_key = os.environ.get("SERPER_API_KEY", "")
+    if not api_key:
+        return "Error: SERPER_API_KEY not set"
+    try:
+        resp = httpx.post(
+            "https://google.serper.dev/search",
+            headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+            json={"q": query, "num": 10},
+            timeout=30,
+        )
+        data = resp.json()
+        results = []
+        for r in data.get("organic", [])[:8]:
+            results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
+        return "\n\n".join(results) or "No results found"
+    except Exception as e:
+        return f"Search error: {e}"
+
 def run_crewai(topic: str, context_messages: list = None):
-    # ── Lazy import: crewai loads here, NOT at module startup ──
-    # This prevents native .so extensions (onnxruntime, tokenizers, etc.)
-    # from crashing the Lambda before FastAPI even starts.
-    from crewai import Agent, Task, Crew, LLM
-    from crewai.tools import BaseTool
-    from typing import Type
-    from pydantic import Field as _Field
-    import httpx as _httpx
-
-    class _SerperSearchInput(BaseModel):
-        query: str = _Field(description="Search query to look up on the internet")
-
-    class _SerperDevTool(BaseTool):
-        name: str = "Internet Search"
-        description: str = "Search the internet for current, accurate information about any topic"
-        args_schema: Type[BaseModel] = _SerperSearchInput
-
-        def _run(self, query: str) -> str:
-            api_key = os.environ.get("SERPER_API_KEY", "")
-            if not api_key:
-                return "Error: SERPER_API_KEY not set"
-            try:
-                resp = _httpx.post(
-                    "https://google.serper.dev/search",
-                    headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
-                    json={"q": query, "num": 10},
-                    timeout=30,
-                )
-                data = resp.json()
-                results = []
-                for r in data.get("organic", [])[:8]:
-                    results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
-                return "\n\n".join(results) or "No results found"
-            except Exception as e:
-                return f"Search error: {e}"
-    # ── End lazy imports ──
-
     context_str = ""
     if context_messages:
         context_str = "Conversation Summary:\n"
@@ -290,75 +296,48 @@ def run_crewai(topic: str, context_messages: list = None):
         context_str += f"Current Question: {topic}\n\n"
 
     def execute(model_name):
-        llm = LLM(
-            model=model_name,
-            temperature=0.01
-        )
-        search_tool = _SerperDevTool()
+        # 1. Search the web
+        search_results = _run_serper_search(topic)
 
-        researcher = Agent(
-            role="Senior Researcher",
-            goal=f"Thoroughly research the topic: {topic}",
-            backstory="You are an expert researcher with a keen eye for detail. You are careful to understand the true context of a query (e.g., distinguishing between a company and a general concept). You provide accurate, comprehensive, and unbiased information.",
-            llm=llm,
-            tools=[search_tool],
-            verbose=True
+        # 2. Researcher Agent
+        researcher_prompt = (
+            f"You are a Senior Researcher with a keen eye for detail.\n"
+            f"Your goal is to thoroughly research the topic: {topic}\n\n"
+            f"{context_str}"
+            f"Conduct comprehensive research on the exact topic based on the user's words.\n"
+            f"Gather essential facts, history, relevant details, and the EXACT URLs/sources you used.\n\n"
+            f"Here are the search results from the web:\n{search_results}\n\n"
+            f"Write a structured report containing the most relevant and accurate facts, context, and details about the topic, including a precise list of the raw URLs used as sources."
         )
+        print(f"Running Researcher on {model_name}...")
+        research_report = call_groq([{"role": "user", "content": researcher_prompt}], model=model_name)
 
-        writer = Agent(
-            role="Versatile Writer",
-            goal="Write an engaging and highly accurate article based on the provided research",
-            backstory="You are a master communicator and writer, known for adapting your tone to the subject matter. Whether writing about history, science, language, or technology, you make complex topics accessible and fascinating.",
-            llm=llm,
-            verbose=True
+        # 3. Writer Agent
+        writer_prompt = (
+            f"You are a Versatile Writer, known for adapting your tone to the subject matter.\n"
+            f"Your goal is to write an engaging and highly accurate article based on the provided research.\n\n"
+            f"Here is the research report:\n{research_report}\n\n"
+            f"Write a well-structured, engaging article about '{topic}' based entirely on the researcher's report. Ensure the tone matches the subject matter. You MUST append a 'References' section at the very end citing the specific sources. Every reference MUST be formatted as a clickable Markdown link using the format: [Source Title](URL). Do not just list the titles; you must include the full URL."
         )
+        print(f"Running Writer on {model_name}...")
+        final_article = call_groq([{"role": "user", "content": writer_prompt}], model=model_name)
+        return final_article
 
-        research_task = Task(
-            description=f"{context_str}Conduct comprehensive research on the exact topic: '{topic}'. Make sure you are researching the correct context of the topic based on the user's words. Gather essential facts, history, relevant details, and the EXACT URLs/sources you used.",
-            expected_output="A structured report containing the most relevant and accurate facts, context, and details about the topic, including a precise list of the raw URLs used as sources.",
-            agent=researcher
-        )
-
-        write_task = Task(
-            description=f"Write a well-structured, engaging article about '{topic}' based entirely on the researcher's report. Ensure the tone matches the subject matter. You MUST append a 'References' section at the very end citing the specific sources. Every reference MUST be formatted as a clickable Markdown link using the format: [Source Title](URL). Do not just list the titles; you must include the full URL.",
-            expected_output="A multi-paragraph, beautifully formatted Markdown article exploring the topic in depth. The article MUST end with a 'References' section containing bullet points of clickable Markdown links (e.g., [Wikipedia](https://wikipedia.org)).",
-            agent=writer,
-            context=[research_task]
-        )
-
-        crew = Crew(
-            agents=[researcher, writer],
-            tasks=[research_task, write_task],
-            verbose=True
-        )
-
-        result = crew.kickoff()
-        return str(result)
-        
     try:
-        return execute("groq/llama-3.3-70b-versatile")
+        return execute("llama-3.3-70b-versatile")
     except Exception as e:
         print(f"Primary model failed in run_crewai: {e}. Retrying with fallback.")
-        return execute("groq/llama-3.1-8b-instant")
+        return execute("llama-3.1-8b-instant")
 
 def run_clarification_check(topic: str):
-    from crewai import Agent, Task, Crew, LLM  # lazy import
     def execute(model_name):
-        llm = LLM(model=model_name, temperature=0.1)
-        evaluator = Agent(
-            role="Query Evaluator",
-            goal="Determine if a user's query is highly ambiguous and needs clarification.",
-            backstory="You are an expert at understanding user intent.",
-            llm=llm,
-            verbose=False
+        evaluator_prompt = (
+            f"You are a Query Evaluator, an expert at understanding user intent.\n"
+            f"Your goal is to determine if a user's query is highly ambiguous and needs clarification.\n\n"
+            f"Evaluate this query: '{topic}'. If it is highly ambiguous (e.g., a single word with multiple meanings like 'Apple', or gibberish), provide 2-4 specific clarification options. If it is a standard query, return 'CLEAR'. Respond ONLY with valid JSON format: {{\"status\": \"clear\"}} OR {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}"
         )
-        eval_task = Task(
-            description=f"Evaluate this query: '{topic}'. If it is highly ambiguous (e.g., a single word with multiple meanings like 'Apple', or gibberish), provide 2-4 specific clarification options. If it is a standard query, return 'CLEAR'. Respond ONLY with valid JSON format: {{\"status\": \"clear\"}} OR {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}",
-            expected_output="JSON output containing the evaluation status.",
-            agent=evaluator
-        )
-        crew = Crew(agents=[evaluator], tasks=[eval_task], verbose=False)
-        result = str(crew.kickoff())
+        result = call_groq([{"role": "user", "content": evaluator_prompt}], model=model_name)
+        
         # Extract JSON from potential markdown blocks
         if "```json" in result:
             result = result.split("```json")[1].split("```")[0]
@@ -367,37 +346,31 @@ def run_clarification_check(topic: str):
         return json.loads(result.strip())
         
     try:
-        return execute("groq/llama-3.3-70b-versatile")
+        return execute("llama-3.3-70b-versatile")
     except Exception as e:
         print(f"Primary model failed in run_clarification_check: {e}. Retrying with fallback.")
         try:
-            return execute("groq/llama-3.1-8b-instant")
+            return execute("llama-3.1-8b-instant")
         except Exception:
             return {"status": "clear"} # fallback
 
 def run_revision(topic: str, current_report: str, feedback: str):
     def execute(model_name):
-        llm = LLM(model=model_name, temperature=0.1)
-        editor = Agent(
-            role="Expert Editor",
-            goal="Revise the report based on user feedback.",
-            backstory="You are a skilled editor who can adapt existing content flawlessly to meet new requirements while retaining accuracy.",
-            llm=llm,
-            verbose=True
+        editor_prompt = (
+            f"You are an Expert Editor. You are a skilled editor who can adapt existing content flawlessly to meet new requirements while retaining accuracy.\n"
+            f"Your goal is to revise the report based on user feedback.\n\n"
+            f"Topic: {topic}\n\n"
+            f"Current Report:\n{current_report}\n\n"
+            f"User Feedback: {feedback}\n\n"
+            f"Rewrite the report to incorporate the user's feedback. Output ONLY the revised markdown content."
         )
-        revise_task = Task(
-            description=f"Topic: {topic}\n\nCurrent Report:\n{current_report}\n\nUser Feedback: {feedback}\n\nRewrite the report to incorporate the user's feedback. Output ONLY the revised markdown content.",
-            expected_output="A complete, revised Markdown article.",
-            agent=editor
-        )
-        crew = Crew(agents=[editor], tasks=[revise_task], verbose=True)
-        return str(crew.kickoff())
+        return call_groq([{"role": "user", "content": editor_prompt}], model=model_name)
         
     try:
-        return execute("groq/llama-3.3-70b-versatile")
+        return execute("llama-3.3-70b-versatile")
     except Exception as e:
         print(f"Primary model failed in run_revision: {e}. Retrying with fallback.")
-        return execute("groq/llama-3.1-8b-instant")
+        return execute("llama-3.1-8b-instant")
 
 @app.post("/api/research")
 async def research_topic(request: ResearchRequest, user_id: str = Depends(get_current_user)):
