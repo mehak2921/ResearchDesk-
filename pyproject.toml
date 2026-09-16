@@ -13,3 +13,5 @@ dependencies = [
     "httpx==0.28.1",
     "sse-starlette==3.4.6",
 ]
+[tool.vercel]
+entrypoint = "main:app"
