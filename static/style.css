@@ -1122,3 +1122,33 @@ h1, h2, h3, h4, h5, h6 {
     color: #2563eb !important;
     text-decoration: underline !important;
 }
+
+/* Essential Mobile Fixes for Markdown Content */
+.markdown-body table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-bottom: 1.5rem;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem 1rem;
+    white-space: normal;
+    min-width: 120px; /* ensure columns don't crush too much */
+}
+
+.markdown-body img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px;
+}
+
+/* Fix pre/code block scrolling on mobile */
+.markdown-body pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
