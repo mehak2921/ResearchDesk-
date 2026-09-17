@@ -658,6 +658,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    let speechChunks = [];
+    let currentChunkIndex = 0;
+
+    function playNextChunk() {
+        if (currentChunkIndex >= speechChunks.length) {
+            speakBtn.innerHTML = '<i class="ph-fill ph-speaker-high"></i> Speak';
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(speechChunks[currentChunkIndex]);
+        
+        utterance.onend = () => {
+            currentChunkIndex++;
+            playNextChunk();
+        };
+        
+        utterance.onerror = (e) => {
+            console.error('Speech synthesis error', e);
+            speakBtn.innerHTML = '<i class="ph-fill ph-speaker-high"></i> Speak';
+        };
+
+        speechSynthesis.speak(utterance);
+    }
+
     speakBtn.addEventListener('click', () => {
         if ('speechSynthesis' in window) {
             if (speechSynthesis.speaking) {
@@ -665,14 +688,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 speakBtn.innerHTML = '<i class="ph-fill ph-speaker-high"></i> Speak';
             } else {
                 const text = reportContent.innerText;
-                const utterance = new SpeechSynthesisUtterance(text);
+                if (!text.trim()) return;
                 
-                utterance.onend = () => {
-                    speakBtn.innerHTML = '<i class="ph-fill ph-speaker-high"></i> Speak';
-                };
+                // Chrome bug: Speech API fails silently or stops after 15 seconds on long texts
+                // Fix: Split into smaller sentences/chunks and queue them safely for all browsers
+                const rawChunks = text.split(/([.!?\n]+)/);
+                speechChunks = [];
+                let currentChunk = "";
                 
+                for (let i = 0; i < rawChunks.length; i++) {
+                    const chunk = rawChunks[i];
+                    if (!chunk) continue;
+                    
+                    // If it's punctuation, append it to the current chunk
+                    if (/^[.!?\n]+$/.test(chunk)) {
+                        currentChunk += chunk;
+                    } else {
+                        // If it's text, decide whether to append or push
+                        if ((currentChunk + chunk).length < 200) {
+                            currentChunk += chunk;
+                        } else {
+                            if (currentChunk.trim()) speechChunks.push(currentChunk.trim());
+                            currentChunk = chunk;
+                        }
+                    }
+                }
+                if (currentChunk.trim()) speechChunks.push(currentChunk.trim());
+                
+                currentChunkIndex = 0;
                 speakBtn.innerHTML = '<i class="ph-fill ph-stop"></i> Stop';
-                speechSynthesis.speak(utterance);
+                playNextChunk();
             }
         } else {
             alert("Sorry, your browser doesn't support text to speech!");
@@ -686,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['css', 'legacy'] }
+            pagebreak:    { mode: 'css', avoid: ['tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'li'] }
         };
         const clone = reportContent.cloneNode(true);
         clone.classList.add('pdf-export');
