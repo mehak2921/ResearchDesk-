@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-color: #050505;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -1074,7 +1074,51 @@ h1, h2, h3, h4, h5, h6 {
         position: absolute;
     }
 }
- 
- / *   P r i n t   r u l e s   f o r   P D F   g e n e r a t i o n   * /  
- . r e p o r t - c o n t e n t   p ,   . r e p o r t - c o n t e n t   h 1 ,   . r e p o r t - c o n t e n t   h 2 ,   . r e p o r t - c o n t e n t   h 3 ,   . r e p o r t - c o n t e n t   l i ,   . r e p o r t - c o n t e n t   t r ,   . r e p o r t - c o n t e n t   b l o c k q u o t e   {   p a g e - b r e a k - i n s i d e :   a v o i d ;   b r e a k - i n s i d e :   a v o i d ;   }  
+
  
+ / *   P r i n t   r u l e s   f o r   P D F   g e n e r a t i o n   * / 
+ 
+ . r e p o r t - c o n t e n t   p ,   . r e p o r t - c o n t e n t   h 1 ,   . r e p o r t - c o n t e n t   h 2 ,   . r e p o r t - c o n t e n t   h 3 ,   . r e p o r t - c o n t e n t   l i ,   . r e p o r t - c o n t e n t   t r ,   . r e p o r t - c o n t e n t   b l o c k q u o t e   {   p a g e - b r e a k - i n s i d e :   a v o i d ;   b r e a k - i n s i d e :   a v o i d ;   } 
+ 
+ 
+/* Print rules for PDF generation */
+.report-content p, 
+.report-content h1, 
+.report-content h2, 
+.report-content h3, 
+.report-content li, 
+.report-content tr, 
+.report-content td,
+.report-content blockquote { 
+    page-break-inside: avoid !important; 
+    break-inside: avoid !important; 
+}
+
+/* PDF Export Styles */
+.pdf-export {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    padding: 20px !important;
+}
+.pdf-export * {
+    color: #000000 !important;
+}
+.pdf-export table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+.pdf-export th, .pdf-export td {
+    border: 1px solid #94a3b8 !important;
+    padding: 8px !important;
+}
+.pdf-export th {
+    background-color: #f1f5f9 !important;
+}
+.pdf-export pre, .pdf-export code {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.pdf-export a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+}
