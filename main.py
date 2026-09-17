@@ -32,6 +32,18 @@ from dotenv import load_dotenv
 print("[STARTUP] dotenv OK", flush=True)
 
 print("[STARTUP] all core imports done! FastAPI ready.", flush=True)
+
+# Create the FastAPI app EARLY so Vercel's static parser can find it
+app = FastAPI(title="AI Research Agent API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # crewai is imported lazily inside run_crewai() to avoid native .so crash at startup
 
 load_dotenv()
@@ -108,17 +120,6 @@ if redis_url:
     except Exception as e:
         print(f"Warning: Failed to connect to Redis: {e}")
         redis_client = None
-
-
-app = FastAPI(title="AI Research Agent API")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # --- Pydantic Models ---
 class ResearchRequest(BaseModel):
