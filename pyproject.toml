@@ -12,6 +12,7 @@ dependencies = [
     "pydantic==2.12.5",
     "httpx==0.28.1",
     "sse-starlette==3.4.6",
+    "duckduckgo-search==6.2.13",
 ]
 [tool.vercel]
 entrypoint = "main:app"

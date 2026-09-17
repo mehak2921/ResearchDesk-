@@ -285,11 +285,26 @@ def call_groq(messages: list, model: str = "openai/gpt-oss-120b") -> str:
         print(f"Groq API error with {model}: {e}")
         raise e
 
-def _run_serper_search(query: str) -> str:
+def _run_search(query: str) -> str:
     import httpx
+    
+    # Primary: DuckDuckGo (Free, no API key)
+    try:
+        from duckduckgo_search import DDGS
+        results = []
+        with DDGS() as ddgs:
+            ddg_results = list(ddgs.text(query, max_results=8))
+        if ddg_results:
+            for r in ddg_results:
+                results.append(f"**{r.get('title','')}**\n{r.get('body','')}\nURL: {r.get('href','')}")
+            return "\n\n".join(results)
+    except Exception as e:
+        print(f"DuckDuckGo search failed: {e}. Falling back to Serper...")
+        
+    # Fallback: Serper API
     api_key = os.environ.get("SERPER_API_KEY", "")
     if not api_key:
-        return "Error: SERPER_API_KEY not set"
+        return "Error: DuckDuckGo failed and SERPER_API_KEY not set for fallback."
     try:
         resp = httpx.post(
             "https://google.serper.dev/search",
@@ -317,7 +332,7 @@ def run_crewai(topic: str, context_messages: list = None):
 
     def execute(model_name):
         # 1. Search the web
-        search_results = _run_serper_search(topic)
+        search_results = _run_search(topic)
 
         # 2. Researcher Agent
         researcher_prompt = (
