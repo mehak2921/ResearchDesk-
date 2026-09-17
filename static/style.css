@@ -1074,3 +1074,7 @@ h1, h2, h3, h4, h5, h6 {
         position: absolute;
     }
 }
+ 
+ / *   P r i n t   r u l e s   f o r   P D F   g e n e r a t i o n   * /  
+ . r e p o r t - c o n t e n t   p ,   . r e p o r t - c o n t e n t   h 1 ,   . r e p o r t - c o n t e n t   h 2 ,   . r e p o r t - c o n t e n t   h 3 ,   . r e p o r t - c o n t e n t   l i ,   . r e p o r t - c o n t e n t   t r ,   . r e p o r t - c o n t e n t   b l o c k q u o t e   {   p a g e - b r e a k - i n s i d e :   a v o i d ;   b r e a k - i n s i d e :   a v o i d ;   }  
+ 

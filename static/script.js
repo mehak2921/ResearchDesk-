@@ -685,7 +685,8 @@ document.addEventListener('DOMContentLoaded', () => {
             filename:     `${currentTopic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, logging: false },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
         const clone = reportContent.cloneNode(true);
         clone.style.backgroundColor = '#0f172a'; 
