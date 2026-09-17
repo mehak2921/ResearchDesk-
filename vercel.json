@@ -1,27 +1,13 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "main.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "900mb",
-        "excludeFiles": "**/{onnxruntime,chromadb,lancedb,lance_namespace,lance_namespace_urllib3_client,huggingface_hub,tokenizers,kubernetes,pyarrow,hf_xet,pdfminer,pdfplumber,pypdfium2,fitz,grpcio}/**"
-      }
+      "source": "/static/(.*)",
+      "destination": "/static/$1"
     },
     {
-      "src": "static/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "main.py"
+      "source": "/(.*)",
+      "destination": "/main.py"
     }
   ]
 }
