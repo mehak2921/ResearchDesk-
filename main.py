@@ -270,8 +270,9 @@ def call_groq(messages: list, model: str = "openai/gpt-oss-120b") -> str:
                 "model": model,
                 "messages": messages,
                 "temperature": 0.01,
+                "max_tokens": 8000
             },
-            timeout=60.0
+            timeout=120.0
         )
         if resp.status_code >= 400:
             error_msg = f"Groq API Error {resp.status_code}: {resp.text}"
