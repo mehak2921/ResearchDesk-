@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     // Auth Elements
     const authOverlay = document.getElementById('auth-overlay');
     const authForm = document.getElementById('auth-form');
@@ -87,15 +87,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Authentication Flow ---
 
+    const landingPage = document.getElementById('landing-page');
+    const appLayout = document.getElementById('app-layout');
+    const getStartedBtn = document.getElementById('get-started-btn');
+
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', () => {
+            authOverlay.classList.remove('hidden');
+        });
+    }
+
+    authOverlay.addEventListener('click', (e) => {
+        if (e.target === authOverlay && !sessionToken) {
+            authOverlay.classList.add('hidden');
+        }
+    });
+
     function updateAuthUI() {
         if (sessionToken) {
+            if(landingPage) landingPage.style.display = 'none';
+            if(appLayout) appLayout.style.display = '';
             authOverlay.classList.add('hidden');
             if (currentUser && currentUser.email) {
                 userEmailDisplay.textContent = currentUser.email;
             }
             fetchHistory();
         } else {
-            authOverlay.classList.remove('hidden');
+            if(landingPage) landingPage.style.display = 'flex';
+            if(appLayout) appLayout.style.display = 'none';
+            authOverlay.classList.add('hidden');
             resetAuthForm();
         }
     }
@@ -842,3 +862,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Auth state
     updateAuthUI();
 });
+
