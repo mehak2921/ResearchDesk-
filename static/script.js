@@ -277,6 +277,7 @@
     }
 
     editProfileBtn.addEventListener('click', () => {
+        if (sidebar) sidebar.classList.remove('open');
         profileModal.classList.remove('hidden');
         newPassword.value = '';
         profileMessage.textContent = '';
@@ -862,4 +863,6 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
+
 
