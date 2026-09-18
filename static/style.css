@@ -1279,7 +1279,7 @@ h1, h2, h3, h4, h5, h6 {
         transition: width 0.3s ease;
     }
     
-    .sidebar.collapsed {
+    .sidebar.collapsed { align-items: center;
         width: 68px;
         padding: 1rem 0.25rem !important;
     }
@@ -1303,7 +1303,7 @@ h1, h2, h3, h4, h5, h6 {
         flex-direction: column;
     }
     
-    .sidebar.collapsed .cgpt-new-chat-btn {
+    .sidebar.collapsed .cgpt-new-chat-btn { width: 40px !important; margin: 0 auto; height: 40px; border-radius: 8px;
         justify-content: center;
         padding: 0.75rem 0 !important;
     }
@@ -1384,5 +1384,6 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar.collapsed .brand-toggle-btn:hover .hover-icon {
     display: block;
 }
+
 
 
