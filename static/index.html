@@ -102,19 +102,26 @@
     </div>
     
     <div id="app-layout" class="layout" style="display: none;">
-                <aside class="sidebar glass-panel" style="padding: 1rem 0.5rem; display: flex; flex-direction: column;">
-            <div class="sidebar-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem;">
+                        <aside class="sidebar glass-panel" style="padding: 1rem 0.5rem; display: flex; flex-direction: column;">
+            <div class="sidebar-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">The Research Desk</h3>
-                <div style="display: flex; gap: 0.2rem;">
-                    <button id="desktop-sidebar-toggle" class="brand-toggle-btn" title="Toggle Sidebar"><i class="ph-fill ph-sparkle default-icon"></i><i class="ph ph-sidebar hover-icon"></i></button> <button id="sidebar-search-btn" class="icon-btn" title="Search" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-magnifying-glass"></i></button>
-                    <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-x"></i></button>
-                </div>
+                <button id="desktop-sidebar-toggle" class="brand-toggle-btn" title="Toggle Sidebar"><i class="ph-fill ph-sparkle default-icon"></i><i class="ph ph-sidebar hover-icon"></i></button>
+                <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-x"></i></button>
             </div>
 
-            <input type="text" id="sidebar-search-input" placeholder="Search history..." style="display: none; width: 100%; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; margin-bottom: 1rem; font-size: 0.9rem;"> <button id="new-chat-btn" class="cgpt-new-chat-btn" title="New Research" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; margin-bottom: 1.5rem; font-size: 0.95rem;">
-                <i class="ph ph-note-pencil" style="font-size: 1.2rem;"></i>
-                <span>New chat</span>
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <button id="new-chat-btn" class="cgpt-new-chat-btn" title="New Research" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; font-size: 0.95rem;">
+                    <i class="ph ph-note-pencil" style="font-size: 1.2rem;"></i>
+                    <span>New chat</span>
+                </button>
+                
+                <button id="sidebar-search-btn" class="cgpt-new-chat-btn" title="Search History" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; font-size: 0.95rem;">
+                    <i class="ph ph-magnifying-glass" style="font-size: 1.2rem;"></i>
+                    <span>Search</span>
+                </button>
+                
+                <input type="text" id="sidebar-search-input" placeholder="Search history..." style="display: none; width: 100%; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; font-size: 0.9rem;">
+            </div>
             
             <div id="recents-toggle-btn" class="recents-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; padding: 0 1rem; font-weight: 500; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; transition: color 0.2s;">Recents <i id="recents-caret" class="ph ph-caret-right" style="font-size: 0.7rem; transition: transform 0.2s;"></i></div>
             
@@ -250,6 +257,7 @@
     <script src="/static/script.js?v=20"></script>
 </body>
 </html>
+
 
 
 
