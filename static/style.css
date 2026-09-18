@@ -1265,3 +1265,10 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+
+.cgpt-new-chat-btn:hover {
+    background: rgba(255,255,255,0.08) !important;
+}
+.user-info:hover {
+    background: rgba(255,255,255,0.08) !important;
+}

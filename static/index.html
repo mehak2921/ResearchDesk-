@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -102,36 +102,38 @@
     </div>
     
     <div id="app-layout" class="layout" style="display: none;">
-        <aside class="sidebar glass-panel">
-            <div class="sidebar-header">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <h3><i class="ph-fill ph-clock-counter-clockwise"></i> History</h3>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button id="new-chat-btn" class="icon-btn primary-icon-btn" title="New Research">
-                        <i class="ph ph-plus"></i> <span class="desktop-only">New</span>
-                    </button>
-                    <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close">
-                        <i class="ph ph-x"></i>
-                    </button>
+                <aside class="sidebar glass-panel" style="padding: 1rem 0.5rem; display: flex; flex-direction: column;">
+            <div class="sidebar-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem;">
+                <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0; color: white;">The Desk</h3>
+                <div style="display: flex; gap: 0.2rem;">
+                    <button class="icon-btn" title="Search" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-magnifying-glass"></i></button>
+                    <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-x"></i></button>
                 </div>
             </div>
-            <div id="history-list" class="history-list">
+
+            <button id="new-chat-btn" class="cgpt-new-chat-btn" title="New Research" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                <i class="ph ph-note-pencil" style="font-size: 1.2rem;"></i>
+                <span>New chat</span>
+            </button>
+            
+            <div class="recents-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; padding: 0 1rem; font-weight: 500;">Recents</div>
+            
+            <div id="history-list" class="history-list" style="padding: 0 0.5rem; flex: 1; overflow-y: auto;">
                 <div class="history-empty">
                     <i class="ph ph-empty-state" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
-                    <p>No past research found.</p>
                 </div>
             </div>
-            <div class="sidebar-footer">
-                <div class="user-info" id="user-profile-btn" title="Profile Settings" style="cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; margin-left: -0.5rem; margin-right: -0.5rem;">
-                    <i class="ph-fill ph-user-circle"></i>
-                    <span id="user-email-display">user@example.com</span>
+            
+            <div class="sidebar-footer" style="padding: 1rem 0.5rem 0 0.5rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05);">
+                <div class="user-info" id="user-profile-btn" title="Profile Settings" style="cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="ph-fill ph-user-circle" style="font-size: 1.5rem; color: rgba(255,255,255,0.7);"></i>
+                    <span id="user-email-display" style="font-size: 0.9rem; color: rgba(255,255,255,0.9); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">user@example.com</span>
                 </div>
-                <div id="user-actions-container" class="user-actions hidden" style="margin-top: 0.25rem;">
-                    <button id="edit-profile-btn" class="icon-btn primary-icon-btn" title="Edit Profile">
-                        <i class="ph ph-pencil-simple"></i> Edit
+                <div id="user-actions-container" class="user-actions hidden" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button id="edit-profile-btn" class="icon-btn primary-icon-btn" title="Edit Profile" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.05); border: none;">
+                        <i class="ph ph-pencil-simple"></i> Edit Profile
                     </button>
-                    <button id="logout-btn" class="icon-btn primary-icon-btn" title="Logout" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #fca5a5;">
+                    <button id="logout-btn" class="icon-btn primary-icon-btn" title="Logout" style="width: 100%; justify-content: center; background: rgba(239, 68, 68, 0.1); border: none; color: #fca5a5;">
                         <i class="ph ph-sign-out"></i> Logout
                     </button>
                 </div>
@@ -248,3 +250,4 @@
     <script src="/static/script.js?v=20"></script>
 </body>
 </html>
+
