@@ -1345,6 +1345,8 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
 }
 
+
+/* Sidebar Toggle Logic */
 .brand-toggle-btn {
     background: transparent;
     border: none;
@@ -1362,12 +1364,25 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.08);
     color: white;
 }
-.brand-toggle-btn .hover-icon {
+
+/* When sidebar is EXPANDED (not collapsed) */
+.sidebar:not(.collapsed) .brand-toggle-btn .default-icon {
     display: none;
 }
-.brand-toggle-btn:hover .default-icon {
+.sidebar:not(.collapsed) .brand-toggle-btn .hover-icon {
+    display: block;
+}
+
+/* When sidebar is COLLAPSED */
+.sidebar.collapsed .brand-toggle-btn .hover-icon {
     display: none;
 }
-.brand-toggle-btn:hover .hover-icon {
+.sidebar.collapsed .brand-toggle-btn .default-icon {
+    display: block;
+}
+.sidebar.collapsed .brand-toggle-btn:hover .default-icon {
+    display: none;
+}
+.sidebar.collapsed .brand-toggle-btn:hover .hover-icon {
     display: block;
 }
