@@ -520,6 +520,7 @@
     }
 
     newChatBtn.addEventListener('click', () => {
+        if (sidebar) sidebar.classList.remove('open');
         input.value = '';
         currentTopic = "Research Report";
         reportTitle.innerText = "Research Report";
@@ -915,6 +916,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
