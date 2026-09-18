@@ -177,7 +177,7 @@
         resetAuthForm();
     });
 
-    authform.addEventListener('submit', async (e) => {
+    authForm.addEventListener('submit', async (e) => {
         if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         const email = authEmail.value;
@@ -351,7 +351,7 @@
         profileModal.classList.add('hidden');
     });
 
-    profileform.addEventListener('submit', async (e) => {
+    profileForm.addEventListener('submit', async (e) => {
         if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         profileMessage.textContent = "Updating...";
@@ -680,7 +680,7 @@
         }
     });
 
-    revisionform.addEventListener('submit', async (e) => {
+    revisionForm.addEventListener('submit', async (e) => {
         if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         const feedback = revisionInput.value.trim();
@@ -931,6 +931,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
