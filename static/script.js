@@ -384,7 +384,6 @@
                                 <i class="ph ph-trash"></i>
                             </button>
                         </div>
-                        <span>${date}</span>
                     `;
                     
                     el.addEventListener('click', (e) => {
@@ -863,6 +862,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
