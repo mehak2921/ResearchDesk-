@@ -235,6 +235,25 @@
         updateAuthUI();
     });
 
+    
+    // --- Recents Toggle Flow ---
+    const recentsToggleBtn = document.getElementById('recents-toggle-btn');
+    const recentsCaret = document.getElementById('recents-caret');
+    
+    if (recentsToggleBtn && historyList && recentsCaret) {
+        recentsToggleBtn.addEventListener('click', () => {
+            if (historyList.style.display === 'none') {
+                historyList.style.display = 'block';
+                recentsCaret.classList.remove('ph-caret-right');
+                recentsCaret.classList.add('ph-caret-down');
+            } else {
+                historyList.style.display = 'none';
+                recentsCaret.classList.remove('ph-caret-down');
+                recentsCaret.classList.add('ph-caret-right');
+            }
+        });
+    }
+
     // --- Mobile Sidebar Flow ---
     if (mobileMenuBtn && sidebar && closeSidebarBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -862,6 +881,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
