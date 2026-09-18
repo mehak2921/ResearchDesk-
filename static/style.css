@@ -1344,3 +1344,30 @@ h1, h2, h3, h4, h5, h6 {
 #desktop-sidebar-toggle:hover {
     color: white;
 }
+
+.brand-toggle-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 1.4rem;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.brand-toggle-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+.brand-toggle-btn .hover-icon {
+    display: none;
+}
+.brand-toggle-btn:hover .default-icon {
+    display: none;
+}
+.brand-toggle-btn:hover .hover-icon {
+    display: block;
+}
