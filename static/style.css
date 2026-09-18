@@ -1259,3 +1259,13 @@ h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
 }
 
+
+@media (max-width: 600px) {
+    #revise-btn {
+        min-width: unset !important;
+        padding: 0 1rem !important;
+    }
+    #revise-btn .btn-text {
+        display: none;
+    }
+}

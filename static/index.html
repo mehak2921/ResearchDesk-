@@ -218,18 +218,23 @@
                     
                     <!-- Revision Feedback Bar -->
                     <div id="revision-container" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-                        <form id="revision-form" style="display: flex; gap: 0.75rem;">
-                            <div class="input-wrapper" style="flex: 1; border-radius: 8px; position: relative;">
-                                <i class="ph ph-chat-text search-icon"></i>
-                                <input type="text" id="revision-input" placeholder="Want to change anything? Ask here..." required autocomplete="off" style="padding: 0 2.5rem 0 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; border-radius: 8px; height: 3rem; outline: none; transition: all 0.3s;">
-                                <button type="button" class="mic-btn" id="mic-revision" title="Voice Input"><i class="ph ph-microphone"></i></button>
-                            </div>
-                            <button type="submit" id="revise-btn" class="glow-btn" style="padding: 0 1.5rem; border-radius: 8px;">
-                                <span class="btn-text">Revise</span>
-                                <i class="ph-fill ph-paper-plane-right btn-icon"></i>
-                                <div class="spinner hidden"></div>
-                            </button>
-                        </form>
+                        <!-- Interactive Revision Form -->
+                        <div id="clarification-container" class="glass-panel" style="margin-top: 2rem; padding: 1.5rem;">
+                            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: white;">Not exactly what you wanted?</h3>
+                            
+                            <form id="revision-form" class="revision-form" style="display: flex; gap: 0.75rem;">
+                                <div class="input-wrapper" style="flex: 1; border-radius: 8px; position: relative;">
+                                    <i class="ph ph-chat-text search-icon"></i>
+                                    <input type="text" id="revision-input" placeholder="Want to change anything?" required autocomplete="off" style="padding: 0 2.5rem 0 2.8rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; border-radius: 8px; height: 3rem; outline: none; transition: all 0.3s;">
+                                    <button type="button" class="mic-btn" id="mic-revision" title="Voice Input"><i class="ph ph-microphone"></i></button>
+                                </div>
+                                <button type="submit" id="revise-btn" class="glow-btn revise-btn" style="padding: 0 1.5rem; border-radius: 8px;">
+                                    <span class="btn-text">Revise</span>
+                                    <i class="ph-fill ph-paper-plane-right btn-icon"></i>
+                                    <div class="spinner hidden"></div>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </main>
