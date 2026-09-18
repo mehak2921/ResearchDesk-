@@ -106,12 +106,12 @@
             <div class="sidebar-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0; color: white;">The Desk</h3>
                 <div style="display: flex; gap: 0.2rem;">
-                    <button class="icon-btn" title="Search" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-magnifying-glass"></i></button>
+                    <button id="sidebar-search-btn" class="icon-btn" title="Search" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-magnifying-glass"></i></button>
                     <button id="close-sidebar-btn" class="icon-btn mobile-only" title="Close" style="border: none; background: transparent; font-size: 1.2rem; padding: 0.4rem; color: rgba(255,255,255,0.7);"><i class="ph ph-x"></i></button>
                 </div>
             </div>
 
-            <button id="new-chat-btn" class="cgpt-new-chat-btn" title="New Research" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; margin-bottom: 1.5rem; font-size: 0.95rem;">
+            <input type="text" id="sidebar-search-input" placeholder="Search history..." style="display: none; width: 100%; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; margin-bottom: 1rem; font-size: 0.9rem;">`n            <button id="new-chat-btn" class="cgpt-new-chat-btn" title="New Research" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: none; background: transparent; color: white; cursor: pointer; text-align: left; transition: background 0.2s; margin-bottom: 1.5rem; font-size: 0.95rem;">
                 <i class="ph ph-note-pencil" style="font-size: 1.2rem;"></i>
                 <span>New chat</span>
             </button>
@@ -250,6 +250,7 @@
     <script src="/static/script.js?v=20"></script>
 </body>
 </html>
+
 
 
 

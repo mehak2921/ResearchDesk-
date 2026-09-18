@@ -254,6 +254,40 @@
         });
     }
 
+    
+    // --- Sidebar Search Flow ---
+    const sidebarSearchBtn = document.getElementById('sidebar-search-btn');
+    const sidebarSearchInput = document.getElementById('sidebar-search-input');
+    
+    if (sidebarSearchBtn && sidebarSearchInput) {
+        sidebarSearchBtn.addEventListener('click', () => {
+            if (sidebarSearchInput.style.display === 'none') {
+                sidebarSearchInput.style.display = 'block';
+                sidebarSearchInput.focus();
+            } else {
+                sidebarSearchInput.style.display = 'none';
+                sidebarSearchInput.value = '';
+                // Reset filter
+                const items = historyList.querySelectorAll('.history-item');
+                items.forEach(item => item.style.display = 'flex');
+            }
+        });
+        
+        sidebarSearchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const items = historyList.querySelectorAll('.history-item');
+            
+            items.forEach(item => {
+                const title = item.querySelector('h4').textContent.toLowerCase();
+                if (title.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
     // --- Mobile Sidebar Flow ---
     if (mobileMenuBtn && sidebar && closeSidebarBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -881,6 +915,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
