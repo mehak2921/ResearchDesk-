@@ -46,6 +46,7 @@
     const downloadImgBtn = document.getElementById('download-img-btn');
     const loadingText = document.getElementById('loading-text');
     const historyList = document.getElementById('history-list');
+    const mainGreeting = document.getElementById('main-greeting');
     const newChatBtn = document.getElementById('new-chat-btn');
 
     // New Interactive Elements
@@ -176,7 +177,8 @@
         resetAuthForm();
     });
 
-    authForm.addEventListener('submit', async (e) => {
+    authform.addEventListener('submit', async (e) => {
+        if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         const email = authEmail.value;
         const password = authPassword.value;
@@ -349,7 +351,8 @@
         profileModal.classList.add('hidden');
     });
 
-    profileForm.addEventListener('submit', async (e) => {
+    profileform.addEventListener('submit', async (e) => {
+        if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         profileMessage.textContent = "Updating...";
         profileMessage.style.color = 'inherit';
@@ -529,6 +532,7 @@
     }
 
     newChatBtn.addEventListener('click', () => {
+        if(mainGreeting) mainGreeting.style.display = 'block';
         if (sidebar) sidebar.classList.remove('open');
         input.value = '';
         currentTopic = "Research Report";
@@ -544,6 +548,7 @@
     });
 
     form.addEventListener('submit', async (e) => {
+        if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         const topic = input.value.trim();
         if (!topic) return;
@@ -675,7 +680,8 @@
         }
     });
 
-    revisionForm.addEventListener('submit', async (e) => {
+    revisionform.addEventListener('submit', async (e) => {
+        if(mainGreeting) mainGreeting.style.display = 'none';
         e.preventDefault();
         const feedback = revisionInput.value.trim();
         if (!feedback) return;
@@ -925,6 +931,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
