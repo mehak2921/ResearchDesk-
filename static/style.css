@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-color: #050505;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -1126,8 +1126,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Essential Mobile Fixes for Markdown Content */
 .markdown-body table {
     display: block !important;
-    width: max-content !important;
-    max-width: 100% !important;
+    width: 100% !important; white-space: nowrap;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     margin-bottom: 1.5rem;
@@ -1249,3 +1248,14 @@ h1, h2, h3, h4, h5, h6 {
     .hero-desc { font-size: 1rem; }
     .landing-container { padding: 2rem 1rem; }
 }
+
+/* --- Text Wrapping Fixes for Long URLs --- */
+.markdown-body a {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+.markdown-body p, .markdown-body li {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
