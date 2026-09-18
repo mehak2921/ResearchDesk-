@@ -288,6 +288,15 @@
         });
     }
 
+    
+    // --- Desktop Sidebar Toggle ---
+    const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
+    if (desktopSidebarToggle && sidebar) {
+        desktopSidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+
     // --- Mobile Sidebar Flow ---
     if (mobileMenuBtn && sidebar && closeSidebarBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -916,6 +925,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 

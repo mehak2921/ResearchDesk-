@@ -1272,3 +1272,75 @@ h1, h2, h3, h4, h5, h6 {
 .user-info:hover {
     background: rgba(255,255,255,0.08) !important;
 }
+
+/* Desktop Collapsed Sidebar State */
+@media (min-width: 769px) {
+    .sidebar {
+        transition: width 0.3s ease;
+    }
+    
+    .sidebar.collapsed {
+        width: 68px;
+        padding: 1rem 0.25rem !important;
+    }
+    
+    .sidebar.collapsed .sidebar-top h3,
+    .sidebar.collapsed .recents-label,
+    .sidebar.collapsed .history-list,
+    .sidebar.collapsed .cgpt-new-chat-btn span,
+    .sidebar.collapsed #user-email-display,
+    .sidebar.collapsed #user-actions-container,
+    .sidebar.collapsed #sidebar-search-input {
+        display: none !important;
+    }
+    
+    .sidebar.collapsed .sidebar-top {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        padding: 0 !important;
+    }
+    
+    .sidebar.collapsed .sidebar-top > div {
+        flex-direction: column;
+    }
+    
+    .sidebar.collapsed .cgpt-new-chat-btn {
+        justify-content: center;
+        padding: 0.75rem 0 !important;
+    }
+    
+    .sidebar.collapsed .cgpt-new-chat-btn i {
+        margin: 0;
+        font-size: 1.4rem !important;
+    }
+    
+    .sidebar.collapsed .sidebar-footer {
+        padding: 1rem 0 0 0 !important;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .sidebar.collapsed .user-info {
+        justify-content: center;
+        padding: 0.5rem 0 !important;
+    }
+    
+    /* Show the toggle button on desktop */
+    #desktop-sidebar-toggle {
+        display: block !important;
+    }
+}
+
+#desktop-sidebar-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.4rem;
+}
+#desktop-sidebar-toggle:hover {
+    color: white;
+}
