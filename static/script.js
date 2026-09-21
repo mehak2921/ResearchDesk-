@@ -94,7 +94,19 @@
 
     if (getStartedBtn) {
         getStartedBtn.addEventListener('click', () => {
-            authOverlay.classList.remove('hidden');
+            if (sessionToken) {
+                showDashboard();
+            } else {
+                authOverlay.classList.remove('hidden');
+                isLoginMode = true;
+                isForgotPasswordMode = false;
+                authTitle.textContent = "Create Account";
+                authSubtitle.textContent = "Register to start researching.";
+                authSubmitBtn.querySelector('.btn-text').textContent = "Register";
+                toggleAuthMode.textContent = "Already have an account? Login";
+                passwordGroup.classList.remove('hidden');
+                authPassword.required = true;
+            }
         });
     }
 
@@ -104,19 +116,30 @@
         }
     });
 
-    function updateAuthUI() {
+        function updateAuthUI() {
         if (sessionToken) {
-            if(landingPage) landingPage.style.display = 'none';
-            if(appLayout) appLayout.style.display = '';
+            // Check if we are already in app layout or dashboard
+            if (appLayout.style.display !== 'flex' && analyticsDashboard.style.display !== 'flex') {
+                showDashboard();
+            }
             authOverlay.classList.add('hidden');
             if (currentUser && currentUser.email) {
                 userEmailDisplay.textContent = currentUser.email;
+                if(navUserEmail) navUserEmail.textContent = currentUser.email;
+                if(navProfileIcon) navProfileIcon.textContent = currentUser.email.charAt(0).toUpperCase();
             }
+            if(navLoggedOut) navLoggedOut.style.display = 'none';
+            if(navLoggedIn) navLoggedIn.style.display = 'flex';
+            if(getStartedBtn) getStartedBtn.textContent = 'Go to Dashboard';
             fetchHistory();
         } else {
-            if(landingPage) landingPage.style.display = 'flex';
-            if(appLayout) appLayout.style.display = 'none';
+            landingPage.style.display = 'flex';
+            appLayout.style.display = 'none';
+            if(analyticsDashboard) analyticsDashboard.style.display = 'none';
             authOverlay.classList.add('hidden');
+            if(navLoggedOut) navLoggedOut.style.display = 'flex';
+            if(navLoggedIn) navLoggedIn.style.display = 'none';
+            if(getStartedBtn) getStartedBtn.textContent = 'Get Started Now';
             resetAuthForm();
         }
     }
@@ -296,6 +319,138 @@
     if (desktopSidebarToggle && sidebar) {
         desktopSidebarToggle.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
+        });
+    }
+
+    
+    // --- New Navigation & Dashboard Logic ---
+    const navLoggedOut = document.getElementById('nav-logged-out');
+    const navLoggedIn = document.getElementById('nav-logged-in');
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    const navDashboardBtn = document.getElementById('nav-dashboard-btn');
+    const navProfileIcon = document.getElementById('nav-profile-icon');
+    const navProfileMenu = document.getElementById('nav-profile-menu');
+    const navUserEmail = document.getElementById('nav-user-email');
+    const navEditProfile = document.getElementById('nav-edit-profile');
+    const navLogout = document.getElementById('nav-logout');
+    
+    const analyticsDashboard = document.getElementById('analytics-dashboard');
+    const backToHomeBtn = document.getElementById('back-to-home-btn');
+    const startNewResearchBtn = document.getElementById('start-new-research-btn');
+    const dashboardUserName = document.getElementById('dashboard-user-name');
+    const statReports = document.getElementById('stat-reports');
+    const statTopics = document.getElementById('stat-topics');
+    const statHours = document.getElementById('stat-hours');
+    const dashboardRecentList = document.getElementById('dashboard-recent-list');
+    
+    // Toggle Profile Menu
+    if(navProfileIcon) {
+        navProfileIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navProfileMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            if(!navProfileMenu.contains(e.target) && e.target !== navProfileIcon) {
+                navProfileMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    if(navLoginBtn) {
+        navLoginBtn.addEventListener('click', () => {
+            authOverlay.classList.remove('hidden');
+            isLoginMode = true;
+            isForgotPasswordMode = false;
+            authTitle.textContent = "Welcome Back";
+            authSubtitle.textContent = "Log in to continue your research.";
+            authSubmitBtn.querySelector('.btn-text').textContent = "Login";
+            toggleAuthMode.textContent = "Don't have an account? Sign up";
+            passwordGroup.classList.remove('hidden');
+            authPassword.required = true;
+        });
+    }
+
+    if(navDashboardBtn) {
+        navDashboardBtn.addEventListener('click', () => {
+            showDashboard();
+        });
+    }
+    if(backToHomeBtn) {
+        backToHomeBtn.addEventListener('click', () => {
+            landingPage.style.display = 'flex';
+            analyticsDashboard.style.display = 'none';
+            appLayout.style.display = 'none';
+        });
+    }
+    if(startNewResearchBtn) {
+        startNewResearchBtn.addEventListener('click', () => {
+            landingPage.style.display = 'none';
+            analyticsDashboard.style.display = 'none';
+            appLayout.style.display = 'flex';
+            if(newChatBtn) newChatBtn.click();
+        });
+    }
+
+    if(navLogout) {
+        navLogout.addEventListener('click', () => {
+            if(logoutBtn) logoutBtn.click();
+        });
+    }
+    if(navEditProfile) {
+        navEditProfile.addEventListener('click', () => {
+            if(editProfileBtn) editProfileBtn.click();
+        });
+    }
+
+    function showDashboard() {
+        landingPage.style.display = 'none';
+        appLayout.style.display = 'none';
+        analyticsDashboard.style.display = 'flex';
+        
+        if (currentUser && currentUser.email) {
+            dashboardUserName.textContent = currentUser.email.split('@')[0];
+        }
+        
+        // Update Stats
+        fetchHistory().then(() => {
+            const reportCount = historyItems.length;
+            statReports.textContent = reportCount;
+            
+            // Unique topics
+            const topics = new Set(historyItems.map(item => item.topic.toLowerCase()));
+            statTopics.textContent = topics.size;
+            
+            // Hours saved (approx 30 mins per report)
+            statHours.textContent = Math.round((reportCount * 0.5) * 10) / 10;
+            
+            // Populate recent activity
+            dashboardRecentList.innerHTML = '';
+            if (historyItems.length === 0) {
+                dashboardRecentList.innerHTML = '<div class="history-empty" style="padding: 3rem 0; text-align: center;"><i class="ph ph-empty-state" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i><p style="color: var(--text-secondary);">No research history yet.</p></div>';
+            } else {
+                // Show top 5
+                const recent5 = historyItems.slice(0, 5);
+                recent5.forEach(item => {
+                    const div = document.createElement('div');
+                    div.style = "padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;";
+                    div.innerHTML = 
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="ph-fill ph-file-text" style="color: #a78bfa;"></i>
+                            <span style="color: white; font-weight: 500;"> + item.topic + </span>
+                        </div>
+                        <i class="ph ph-caret-right" style="color: rgba(255,255,255,0.3);"></i>
+                    ;
+                    div.addEventListener('mouseover', () => div.style.background = 'rgba(255,255,255,0.08)');
+                    div.addEventListener('mouseout', () => div.style.background = 'rgba(255,255,255,0.03)');
+                    div.addEventListener('click', () => {
+                        landingPage.style.display = 'none';
+                        analyticsDashboard.style.display = 'none';
+                        appLayout.style.display = 'flex';
+                        loadHistoryItem(item.id);
+                    });
+                    dashboardRecentList.appendChild(div);
+                });
+            }
         });
     }
 
@@ -931,6 +1086,9 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
+
+
 
 
 

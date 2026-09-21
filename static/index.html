@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -75,6 +75,25 @@
     </div>
     <!-- Landing Page -->
     <div id="landing-page" class="landing-container" style="display: none;">
+        <nav class="landing-navbar" style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 0; left: 0; right: 0; z-index: 100;">
+            <div class="logo" style="font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ph-fill ph-sparkle" style="color: #a78bfa;"></i> The Research Desk
+            </div>
+            <div id="nav-logged-out" style="display: flex; gap: 1rem;">
+                <button id="nav-login-btn" class="action-btn" style="padding: 0.5rem 1.5rem;">Login</button>
+            </div>
+            <div id="nav-logged-in" style="display: none; align-items: center; gap: 1rem;">
+                <button id="nav-dashboard-btn" class="glow-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Dashboard</button>
+                <div class="profile-dropdown-container" style="position: relative;">
+                    <div id="nav-profile-icon" style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-weight: 600; font-size: 1.2rem; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">U</div>
+                    <div id="nav-profile-menu" class="glass-panel hidden" style="position: absolute; right: 0; top: 50px; width: 220px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; border-radius: 12px; z-index: 101;">
+                        <div id="nav-user-email" style="padding: 0.75rem 0.5rem; font-size: 0.85rem; color: rgba(255,255,255,0.7); word-break: break-all; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem; text-align: center; font-weight: 500;">user@example.com</div>
+                        <button id="nav-edit-profile" class="icon-btn" style="width: 100%; justify-content: flex-start; padding: 0.75rem; border-radius: 8px;"><i class="ph ph-pencil-simple"></i> Edit Profile</button>
+                        <button id="nav-logout" class="icon-btn" style="width: 100%; justify-content: flex-start; padding: 0.75rem; color: #fca5a5; border-radius: 8px;"><i class="ph ph-sign-out"></i> Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
         <div class="hero-section">
             <h1 class="hero-title">The Research Desk</h1>
             <p class="hero-subtitle">Skip the search. <span class="highlight">Get the report.</span></p>
@@ -162,7 +181,70 @@
             </div>
         </div>
     </div>
-    
+    <!-- Analytics Dashboard -->
+    <div id="analytics-dashboard" class="layout" style="display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; align-items: flex-start; flex-direction: column; animation: fadeUpIn 0.5s ease-out forwards;">
+        <nav class="landing-navbar" style="width: 100%; padding: 1.5rem 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div class="logo" style="font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ph-fill ph-sparkle" style="color: #a78bfa;"></i> The Research Desk
+            </div>
+            <button id="back-to-home-btn" class="action-btn" style="background: transparent;"><i class="ph ph-house"></i> Home Page</button>
+        </nav>
+
+        <div style="width: 100%; margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Welcome back, <span id="dashboard-user-name" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">User</span>!</h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">Here is your research overview.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; width: 100%; margin-bottom: 4rem;">
+            <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column; gap: 1rem; border-radius: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: var(--text-secondary); font-size: 1rem;">Reports Generated</h3>
+                    <i class="ph-fill ph-file-text" style="font-size: 1.5rem; color: #a78bfa;"></i>
+                </div>
+                <div id="stat-reports" style="font-size: 3rem; font-weight: 700;">0</div>
+            </div>
+            <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column; gap: 1rem; border-radius: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: var(--text-secondary); font-size: 1rem;">Topics Explored</h3>
+                    <i class="ph-fill ph-brain" style="font-size: 1.5rem; color: #34d399;"></i>
+                </div>
+                <div id="stat-topics" style="font-size: 3rem; font-weight: 700;">0</div>
+            </div>
+            <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column; gap: 1rem; border-radius: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: var(--text-secondary); font-size: 1rem;">Hours Saved</h3>
+                    <i class="ph-fill ph-hourglass-high" style="font-size: 1.5rem; color: #60a5fa;"></i>
+                </div>
+                <div id="stat-hours" style="font-size: 3rem; font-weight: 700;">0</div>
+            </div>
+        </div>
+
+        <!-- Action & Recent -->
+        <div style="display: flex; gap: 2rem; width: 100%; flex-wrap: wrap;">
+            <!-- Left: Start New -->
+            <div class="glass-panel" style="flex: 1; min-width: 300px; padding: 4rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-radius: 20px; border: 1px solid rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.03);">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(167, 139, 250, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <i class="ph-fill ph-sparkle" style="font-size: 2.5rem; color: #a78bfa;"></i>
+                </div>
+                <h2 style="margin-bottom: 1rem; font-size: 1.8rem;">Ready to discover?</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2.5rem; font-size: 1.1rem;">Uncover deep insights on any topic in seconds.</p>
+                <button id="start-new-research-btn" class="glow-btn" style="font-size: 1.1rem; padding: 1rem 2.5rem; border-radius: 30px;">✨ Start New Research</button>
+            </div>
+
+            <!-- Right: Recent Activity -->
+            <div class="glass-panel" style="flex: 2; min-width: 300px; padding: 2rem; border-radius: 20px;">
+                <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;"><i class="ph ph-clock-counter-clockwise"></i> Recent Activity</h3>
+                <div id="dashboard-recent-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 350px; overflow-y: auto; padding-right: 0.5rem;">
+                    <!-- Activity items will be injected here via JS -->
+                    <div class="history-empty" style="padding: 3rem 0; text-align: center;">
+                        <i class="ph ph-empty-state" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p style="color: var(--text-secondary);">No research history yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="app-layout" class="layout" style="display: none;">
                         <aside class="sidebar glass-panel collapsed" style="padding: 1rem 0.5rem; display: flex; flex-direction: column;">
             <div class="sidebar-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem;">
@@ -317,6 +399,7 @@
     <script src="/static/script.js?v=20"></script>
 </body>
 </html>
+
 
 
 
