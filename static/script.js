@@ -433,13 +433,13 @@
                 recent5.forEach(item => {
                     const div = document.createElement('div');
                     div.style = "padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;";
-                    div.innerHTML = 
+                    div.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <i class="ph-fill ph-file-text" style="color: #a78bfa;"></i>
-                            <span style="color: white; font-weight: 500;"> + item.topic + </span>
+                            <span style="color: white; font-weight: 500;">${item.topic}</span>
                         </div>
                         <i class="ph ph-caret-right" style="color: rgba(255,255,255,0.3);"></i>
-                    ;
+                    `;
                     div.addEventListener('mouseover', () => div.style.background = 'rgba(255,255,255,0.08)');
                     div.addEventListener('mouseout', () => div.style.background = 'rgba(255,255,255,0.03)');
                     div.addEventListener('click', () => {
@@ -1086,6 +1086,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
