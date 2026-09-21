@@ -476,9 +476,9 @@
         });
     }
 
-    const userProfileBtn = document.getElementById('user-profile-btn');
-    if (userProfileBtn) {
-        userProfileBtn.addEventListener('click', () => {
+        const sidebarUserProfileBtn = document.getElementById('user-profile-btn');
+    if (sidebarUserProfileBtn) {
+        sidebarUserProfileBtn.addEventListener('click', () => {
             if (sidebar && sidebar.classList.contains('collapsed')) {
                 sidebar.classList.remove('collapsed');
             }
@@ -1117,6 +1117,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
