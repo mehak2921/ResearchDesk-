@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -75,13 +75,11 @@
     </div>
     <!-- Landing Page -->
     <div id="landing-page" class="landing-container" style="display: none;">
-        <nav class="landing-navbar" style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 0; left: 0; right: 0; z-index: 100;">
+        <nav class="landing-navbar" style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; display: flex; justify-content: flex-end; align-items: center; position: absolute; top: 0; left: 0; right: 0; z-index: 100;">
             
-            <div id="nav-logged-out" style="display: flex; gap: 1rem;">
-                <button id="nav-login-btn" class="action-btn" style="padding: 0.5rem 1.5rem;">Login</button>
-            </div>
+            <div id="nav-logged-out" style="display: none;"></div>
             <div id="nav-logged-in" style="display: none; align-items: center; gap: 1rem;">
-                <button id="nav-dashboard-btn" class="glow-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Dashboard</button>
+                
                 <div class="profile-dropdown-container" style="position: relative;">
                     <div id="nav-profile-icon" style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-weight: 600; font-size: 1.2rem; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">U</div>
                     <div id="nav-profile-menu" class="glass-panel hidden" style="position: absolute; right: 0; top: 50px; width: 220px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; border-radius: 12px; z-index: 101;">
@@ -183,7 +181,10 @@
     <div id="analytics-dashboard" class="layout" style="display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; align-items: flex-start; flex-direction: column; animation: fadeUpIn 0.5s ease-out forwards;">
         <nav class="landing-navbar" style="width: 100%; padding: 1.5rem 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
             
-            <button id="back-to-home-btn" class="action-btn" style="background: transparent;"><i class="ph ph-house"></i> Home Page</button>
+            <div style="display: flex; gap: 0.75rem;">
+                <button id="back-to-home-btn" class="action-btn" style="background: transparent;"><i class="ph ph-house"></i> Home Page</button>
+                <button id="go-to-workspace-btn" class="glow-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;"><i class="ph ph-terminal-window"></i> Workspace</button>
+            </div>
         </nav>
 
         <div style="width: 100%; margin-bottom: 3rem;">
@@ -399,6 +400,7 @@
     <script src="/static/script.js?v=20"></script>
 </body>
 </html>
+
 
 
 

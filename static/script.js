@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     // Auth Elements
     const authOverlay = document.getElementById('auth-overlay');
     const authForm = document.getElementById('auth-form');
@@ -116,32 +116,34 @@
         }
     });
 
+
         function updateAuthUI() {
-        if (sessionToken) {
-            // Check if we are already in app layout or dashboard
-            if (appLayout.style.display !== 'flex' && analyticsDashboard.style.display !== 'flex') {
-                showDashboard();
+            if (sessionToken) {
+                authOverlay.classList.add('hidden');
+                if (currentUser && currentUser.email) {
+                    userEmailDisplay.textContent = currentUser.email;
+                    if(navUserEmail) navUserEmail.textContent = currentUser.email;
+                    if(navProfileIcon) navProfileIcon.textContent = currentUser.email.charAt(0).toUpperCase();
+                }
+                if(navLoggedOut) navLoggedOut.style.display = 'none';
+                if(navLoggedIn) navLoggedIn.style.display = 'flex';
+                if(getStartedBtn) getStartedBtn.textContent = 'Go to Dashboard';
+                fetchHistory();
+                
+                if (!window.location.hash || window.location.hash === '#home') {
+                    navigateTo('#dashboard');
+                } else {
+                    handleRoute();
+                }
+            } else {
+                authOverlay.classList.add('hidden');
+                if(navLoggedOut) navLoggedOut.style.display = 'flex';
+                if(navLoggedIn) navLoggedIn.style.display = 'none';
+                if(getStartedBtn) getStartedBtn.textContent = 'Get Started Now';
+                resetAuthForm();
+                navigateTo('#home');
             }
-            authOverlay.classList.add('hidden');
-            if (currentUser && currentUser.email) {
-                userEmailDisplay.textContent = currentUser.email;
-                if(navUserEmail) navUserEmail.textContent = currentUser.email;
-                if(navProfileIcon) navProfileIcon.textContent = currentUser.email.charAt(0).toUpperCase();
-            }
-            if(navLoggedOut) navLoggedOut.style.display = 'none';
-            if(navLoggedIn) navLoggedIn.style.display = 'flex';
-            if(getStartedBtn) getStartedBtn.textContent = 'Go to Dashboard';
-            fetchHistory();
-        } else {
-            landingPage.style.display = 'flex';
-            appLayout.style.display = 'none';
-            if(analyticsDashboard) analyticsDashboard.style.display = 'none';
-            authOverlay.classList.add('hidden');
-            if(navLoggedOut) navLoggedOut.style.display = 'flex';
-            if(navLoggedIn) navLoggedIn.style.display = 'none';
-            if(getStartedBtn) getStartedBtn.textContent = 'Get Started Now';
-            resetAuthForm();
-        }
+
     }
 
     function resetAuthForm() {
@@ -377,16 +379,18 @@
     }
     if(backToHomeBtn) {
         backToHomeBtn.addEventListener('click', () => {
-            landingPage.style.display = 'flex';
-            analyticsDashboard.style.display = 'none';
-            appLayout.style.display = 'none';
+            navigateTo('#home');
+        });
+    }
+    const goToWorkspaceBtn = document.getElementById('go-to-workspace-btn');
+    if(goToWorkspaceBtn) {
+        goToWorkspaceBtn.addEventListener('click', () => {
+            navigateTo('#workspace');
         });
     }
     if(startNewResearchBtn) {
         startNewResearchBtn.addEventListener('click', () => {
-            landingPage.style.display = 'none';
-            analyticsDashboard.style.display = 'none';
-            appLayout.style.display = 'flex';
+            navigateTo('#workspace');
             if(newChatBtn) newChatBtn.click();
         });
     }
@@ -402,33 +406,46 @@
         });
     }
 
-    function showDashboard() {
-        landingPage.style.display = 'none';
-        appLayout.style.display = 'none';
-        analyticsDashboard.style.display = 'flex';
+
+    // --- Hash Routing Logic ---
+    function navigateTo(hash) {
+        window.location.hash = hash;
+    }
+
+    function handleRoute() {
+        const hash = window.location.hash || '#home';
         
+        if(landingPage) landingPage.style.display = 'none';
+        if(appLayout) appLayout.style.display = 'none';
+        if(analyticsDashboard) analyticsDashboard.style.display = 'none';
+        
+        if (hash === '#workspace' && sessionToken) {
+            appLayout.style.display = 'flex';
+        } else if (hash === '#dashboard' && sessionToken) {
+            analyticsDashboard.style.display = 'flex';
+            updateDashboardStats();
+        } else {
+            landingPage.style.display = 'flex';
+        }
+    }
+
+    window.addEventListener('hashchange', handleRoute);
+
+    function updateDashboardStats() {
         if (currentUser && currentUser.email) {
             dashboardUserName.textContent = currentUser.email.split('@')[0];
         }
-        
-        // Update Stats
         fetchHistory().then(() => {
             const reportCount = historyItems.length;
             statReports.textContent = reportCount;
-            
-            // Unique topics
             const topics = new Set(historyItems.map(item => item.topic.toLowerCase()));
             statTopics.textContent = topics.size;
-            
-            // Hours saved (approx 30 mins per report)
             statHours.textContent = Math.round((reportCount * 0.5) * 10) / 10;
             
-            // Populate recent activity
             dashboardRecentList.innerHTML = '';
             if (historyItems.length === 0) {
                 dashboardRecentList.innerHTML = '<div class="history-empty" style="padding: 3rem 0; text-align: center;"><i class="ph ph-empty-state" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i><p style="color: var(--text-secondary);">No research history yet.</p></div>';
             } else {
-                // Show top 5
                 const recent5 = historyItems.slice(0, 5);
                 recent5.forEach(item => {
                     const div = document.createElement('div');
@@ -443,9 +460,7 @@
                     div.addEventListener('mouseover', () => div.style.background = 'rgba(255,255,255,0.08)');
                     div.addEventListener('mouseout', () => div.style.background = 'rgba(255,255,255,0.03)');
                     div.addEventListener('click', () => {
-                        landingPage.style.display = 'none';
-                        analyticsDashboard.style.display = 'none';
-                        appLayout.style.display = 'flex';
+                        navigateTo('#workspace');
                         loadHistoryItem(item.id);
                     });
                     dashboardRecentList.appendChild(div);
@@ -453,6 +468,11 @@
             }
         });
     }
+
+    function showDashboard() {
+        navigateTo('#dashboard');
+    }
+
 
         const sidebarHomeBtn = document.getElementById('sidebar-home-btn');
     if (sidebarHomeBtn) {
