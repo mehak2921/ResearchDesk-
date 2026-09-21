@@ -454,6 +454,37 @@
         });
     }
 
+        const sidebarHomeBtn = document.getElementById('sidebar-home-btn');
+    if (sidebarHomeBtn) {
+        sidebarHomeBtn.addEventListener('click', () => {
+            if (sessionToken) {
+                showDashboard();
+            } else {
+                landingPage.style.display = 'flex';
+                appLayout.style.display = 'none';
+                analyticsDashboard.style.display = 'none';
+            }
+        });
+    }
+
+    // Auto-expand sidebar if search or profile is clicked while collapsed
+    if (sidebarSearchBtn) {
+        sidebarSearchBtn.addEventListener('click', () => {
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+            }
+        });
+    }
+
+    const userProfileBtn = document.getElementById('user-profile-btn');
+    if (userProfileBtn) {
+        userProfileBtn.addEventListener('click', () => {
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+            }
+        });
+    }
+
     // --- Mobile Sidebar Flow ---
     if (mobileMenuBtn && sidebar && closeSidebarBtn) {
         mobileMenuBtn.addEventListener('click', () => {
@@ -1086,6 +1117,7 @@
     // Initialize Auth state
     updateAuthUI();
 });
+
 
 
 
