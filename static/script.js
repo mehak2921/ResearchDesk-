@@ -351,10 +351,16 @@ document.addEventListener('DOMContentLoaded', () => {
         navProfileIcon.addEventListener('click', (e) => {
             e.stopPropagation();
             navProfileMenu.classList.toggle('hidden');
+            if(!navProfileMenu.classList.contains('hidden')) {
+                document.body.classList.add('profile-menu-open');
+            } else {
+                document.body.classList.remove('profile-menu-open');
+            }
         });
         document.addEventListener('click', (e) => {
             if(!navProfileMenu.contains(e.target) && e.target !== navProfileIcon) {
                 navProfileMenu.classList.add('hidden');
+                document.body.classList.remove('profile-menu-open');
             }
         });
     }
