@@ -732,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showReport(topic, markdownReport, pushToHistory = true) {
+        if (mainGreeting) mainGreeting.style.display = 'none';
         currentTopic = topic;
         reportTitle.innerText = topic;
         input.value = topic;
