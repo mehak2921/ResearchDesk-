@@ -462,7 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     div.addEventListener('mouseout', () => div.style.background = 'rgba(255,255,255,0.03)');
                     div.addEventListener('click', () => {
                         navigateTo('#workspace');
-                        loadHistoryItem(item.id);
+                        // Load the actual report
+                        reportHistory = [item.report];
+                        currentReportIndex = 0;
+                        showReport(item.topic, item.report, false);
                     });
                     dashboardRecentList.appendChild(div);
                 });
@@ -478,13 +481,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const sidebarHomeBtn = document.getElementById('sidebar-home-btn');
     if (sidebarHomeBtn) {
         sidebarHomeBtn.addEventListener('click', () => {
-            if (sessionToken) {
-                showDashboard();
-            } else {
-                landingPage.style.display = 'flex';
-                appLayout.style.display = 'none';
-                analyticsDashboard.style.display = 'none';
-            }
+            navigateTo('#home');
+            if (sidebar) sidebar.classList.remove('open');
+        });
+    }
+
+    const sidebarDashboardBtn = document.getElementById('sidebar-dashboard-btn');
+    if (sidebarDashboardBtn) {
+        sidebarDashboardBtn.addEventListener('click', () => {
+            navigateTo('#dashboard');
+            if (sidebar) sidebar.classList.remove('open');
         });
     }
 
