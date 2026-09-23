@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isForgotPasswordMode = false;
     let sessionToken = localStorage.getItem('supabase_token');
     let currentUser = JSON.parse(localStorage.getItem('supabase_user') || 'null');
+    let historyItems = [];
 
     const loadingMessages = [
         "Evaluating query context...",
@@ -641,6 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (data.data && data.data.length > 0) {
+                historyItems = data.data;
                 historyList.innerHTML = '';
                 data.data.forEach(item => {
                     const el = document.createElement('div');
@@ -676,6 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     historyList.appendChild(el);
                 });
             } else {
+                historyItems = [];
                 historyList.innerHTML = `
                     <div class="history-empty">
                         <i class="ph ph-empty-state" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
