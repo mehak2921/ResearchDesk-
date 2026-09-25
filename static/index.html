@@ -97,23 +97,50 @@
             <button id="get-started-btn" class="glow-btn hero-btn">Get Started Now</button>
         </div>
         
-        <div class="features-grid">
-            <div class="feature-card glass-panel">
-                <div class="feature-icon"><i class="ph-fill ph-lightning"></i></div>
-                <h3>Blazing Fast AI</h3>
-                <p>Powered by Groq's ultra-low latency inference to generate massive reports instantly.</p>
+        
+        <div class="carousel-section" style="width: 100%; max-width: 1200px; margin: 4rem auto; padding: 0 1rem; overflow: hidden;">
+            <div class="carousel-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 2rem; font-weight: 600;">Everything you need to <span class="highlight">research smarter</span></h2>
+                <div class="carousel-controls" style="display: flex; gap: 0.5rem;">
+                    <button id="carousel-prev" class="action-btn" style="padding: 0.75rem; border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;"><i class="ph ph-arrow-left"></i></button>
+                    <button id="carousel-next" class="action-btn" style="padding: 0.75rem; border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;"><i class="ph ph-arrow-right"></i></button>
+                </div>
             </div>
-            <div class="feature-card glass-panel">
-                <div class="feature-icon"><i class="ph-fill ph-globe"></i></div>
-                <h3>Live Web Search</h3>
-                <p>Scrapes live data from the web so your research is always accurate and up-to-date.</p>
-            </div>
-            <div class="feature-card glass-panel">
-                <div class="feature-icon"><i class="ph-fill ph-file-pdf"></i></div>
-                <h3>Rich Exports</h3>
-                <p>Download your complete research as a PDF or Word Document with a single click.</p>
+            
+            <div id="feature-carousel" class="scroll-carousel" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1.5rem; padding-bottom: 2rem; scrollbar-width: none; -ms-overflow-style: none;">
+                <!-- Card 1 -->
+                <div class="carousel-card glass-panel">
+                    <div class="card-icon"><i class="ph-fill ph-robot"></i></div>
+                    <h3>Autonomous AI Agent</h3>
+                    <p>Powered by ultra-low latency models that scrape live web data and write comprehensive reports instantly.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="carousel-card glass-panel">
+                    <div class="card-icon"><i class="ph-fill ph-chart-bar"></i></div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Keep track of your generated reports, topics explored, and total hours saved all in one beautiful dashboard.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="carousel-card glass-panel">
+                    <div class="card-icon"><i class="ph-fill ph-export"></i></div>
+                    <h3>Versatile Exports</h3>
+                    <p>Take your research anywhere. Export to PDF, Word (DOCX), high-res Images, or copy raw Markdown in one click.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="carousel-card glass-panel">
+                    <div class="card-icon"><i class="ph-fill ph-speaker-high"></i></div>
+                    <h3>Audio Playback</h3>
+                    <p>Don't want to read? Use our built-in text-to-speech feature to listen to your research reports on the go.</p>
+                </div>
+                <!-- Card 5 -->
+                <div class="carousel-card glass-panel">
+                    <div class="card-icon"><i class="ph-fill ph-clock-counter-clockwise"></i></div>
+                    <h3>Session History</h3>
+                    <p>Never lose a thought. Every report is automatically saved to your history for easy retrieval and revision.</p>
+                </div>
             </div>
         </div>
+
 
         <!-- How It Works Section -->
         <div class="how-it-works-section" style="margin-top: 6rem; width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; padding: 0 1rem;">

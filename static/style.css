@@ -1453,3 +1453,53 @@ h1, h2, h3, h4, h5, h6 {
         animation: fadeIn 0.3s ease forwards;
     }
 }
+/* Feature Carousel */
+.scroll-carousel::-webkit-scrollbar {
+    display: none;
+}
+.carousel-card {
+    flex: 0 0 85%;
+    max-width: 350px;
+    scroll-snap-align: start;
+    padding: 2.5rem;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    border-radius: 24px;
+    cursor: grab;
+    user-select: none;
+}
+@media (min-width: 768px) {
+    .carousel-card { flex: 0 0 45%; max-width: 400px; }
+}
+@media (min-width: 1024px) {
+    .carousel-card { flex: 0 0 30%; }
+}
+.carousel-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(167, 139, 250, 0.4);
+}
+.carousel-card:active {
+    cursor: grabbing;
+}
+.card-icon {
+    width: 60px; height: 60px;
+    border-radius: 16px;
+    background: rgba(167, 139, 250, 0.1);
+    color: #a78bfa;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+.carousel-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: white;
+}
+.carousel-card p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+}
+.carousel-controls .action-btn:active {
+    transform: scale(0.95);
+}

@@ -560,6 +560,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+    // --- Carousel Logic ---
+    const carousel = document.getElementById('feature-carousel');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+
+    if (carousel && prevBtn && nextBtn) {
+        // Button scrolling
+        const scrollAmount = 350;
+        prevBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+        nextBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+
+        // Drag to scroll
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            carousel.style.scrollSnapType = 'none'; // Disable snap while dragging
+            startX = e.pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+        carousel.addEventListener('mouseleave', () => {
+            isDown = false;
+            carousel.style.scrollSnapType = 'x mandatory';
+        });
+        carousel.addEventListener('mouseup', () => {
+            isDown = false;
+            carousel.style.scrollSnapType = 'x mandatory';
+        });
+        carousel.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll-fast multiplier
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+    }
+
     // --- Profile Management ---
     const userProfileBtn = document.getElementById('user-profile-btn');
     const userActionsContainer = document.getElementById('user-actions-container');
