@@ -229,7 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || "Authentication failed");
+                
+                if (!res.ok) {
+                    let errMsg = data.detail || "Authentication failed";
+                    if (errMsg.toLowerCase().includes("invalid login credentials")) {
+                        errMsg = "Please register first or check your password.";
+                    }
+                    if (errMsg.toLowerCase().includes("already registered")) {
+                        errMsg = "User already registered, please login.";
+                    }
+                    throw new Error(errMsg);
+                }
                 
                 if (data.session) {
                     sessionToken = data.session.access_token;
@@ -238,6 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('supabase_user', JSON.stringify(currentUser));
                     updateAuthUI();
                 } else {
+                    if (!isLoginMode && data.user && data.user.identities && data.user.identities.length === 0) {
+                        throw new Error("User already registered, please login.");
+                    }
                     showAuthSuccess("Please check your email to verify your account.");
                 }
             }
@@ -709,8 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function deleteHistoryItem(itemId, elementNode) {
-        if (!confirm("Are you sure you want to delete this report?")) return;
-        
+        // Optimistic UI update could go here, but waiting for server is fine
         try {
             const res = await fetch(`/api/history/${itemId}`, {
                 method: 'DELETE',
