@@ -1504,3 +1504,28 @@ h1, h2, h3, h4, h5, h6 {
 .carousel-controls .action-btn:active {
     transform: scale(0.95);
 }
+/* Circular Carousel Nav Buttons */
+.circular-nav-btn {
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    transition: all 0.3s ease !important;
+    color: white !important;
+}
+.circular-nav-btn:hover {
+    background: rgba(167, 139, 250, 0.2) !important;
+    border-color: rgba(167, 139, 250, 0.5) !important;
+    transform: scale(1.1);
+}
+.circular-nav-btn:active {
+    transform: scale(0.95);
+}
+.circular-nav-btn i {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .circular-nav-btn {
+        display: none !important; /* Hide arrows on mobile to favor swiping */
+    }
+}
