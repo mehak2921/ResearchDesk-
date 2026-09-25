@@ -442,6 +442,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser && currentUser.email) {
             dashboardUserName.textContent = currentUser.email.split('@')[0];
         }
+        
+        statReports.textContent = '...';
+        statTopics.textContent = '...';
+        statHours.textContent = '...';
+        dashboardRecentList.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading activity...</div>';
+        
         fetchHistory().then(() => {
             const reportCount = historyItems.length;
             statReports.textContent = reportCount;
