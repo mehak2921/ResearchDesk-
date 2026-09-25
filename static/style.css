@@ -1529,3 +1529,20 @@ h1, h2, h3, h4, h5, h6 {
         display: none !important; /* Hide arrows on mobile to favor swiping */
     }
 }
+/* Carousel Dots */
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.carousel-dot:hover {
+    background: rgba(255,255,255,0.5);
+}
+.carousel-dot.active {
+    background: #a78bfa;
+    width: 24px;
+    border-radius: 4px;
+}

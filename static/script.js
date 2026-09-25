@@ -599,9 +599,39 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - carousel.offsetLeft;
-            const walk = (x - startX) * 2; // Scroll-fast multiplier
+            const walk = (x - startX) * 2;
             carousel.scrollLeft = scrollLeft - walk;
         });
+
+
+        // Handle scroll dots
+        const dots = document.querySelectorAll('.carousel-dot');
+        const updateDots = () => {
+            if(carousel.scrollWidth === carousel.clientWidth) return;
+            const scrollPercentage = carousel.scrollLeft / (carousel.scrollWidth - carousel.clientWidth);
+            let activeIndex = Math.round(scrollPercentage * (dots.length - 1));
+            if(activeIndex < 0) activeIndex = 0;
+            if(activeIndex >= dots.length) activeIndex = dots.length - 1;
+            
+            dots.forEach((dot, index) => {
+                if (index === activeIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        };
+
+        carousel.addEventListener('scroll', updateDots);
+        setTimeout(updateDots, 100);
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                const scrollTarget = (index / (dots.length - 1)) * (carousel.scrollWidth - carousel.clientWidth);
+                carousel.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+            });
+        });
+
     }
 
     // --- Profile Management ---
