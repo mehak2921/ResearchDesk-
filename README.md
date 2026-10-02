@@ -1,6 +1,6 @@
 ﻿# 🔬 The Research Desk
 
-A powerful, AI-driven research assistant that autonomously searches the web, synthesizes information, and generates comprehensive, well-formatted reports on any topic in seconds. 
+Developed an AI-powered research application using multi-agent workflows to generate detailed, cited reports from user queries, with authentication, conversation memory, clarification handling, caching, revision-based editing, and PDF/Word/Image export. 
 
 Built with blazing-fast **Groq** AI, **Supabase** authentication, and hosted on **Vercel**.
 
