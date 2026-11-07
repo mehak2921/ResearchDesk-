@@ -258,6 +258,43 @@ def list_models():
 PRIMARY_MODEL = os.environ.get("GROQ_PRIMARY_MODEL", "openai/gpt-oss-120b")
 FALLBACK_MODEL = os.environ.get("GROQ_FALLBACK_MODEL", "openai/gpt-oss-20b")
 
+# NVIDIA NIM Integration (https://build.nvidia.com)
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY")
+NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
+
+def call_nvidia(messages: list, model: str = NVIDIA_MODEL) -> str:
+    import httpx
+    api_key = os.environ.get("NVIDIA_API_KEY")
+    if not api_key:
+        raise Exception("NVIDIA_API_KEY not configured")
+    
+    try:
+        resp = httpx.post(
+            "https://integrate.api.nvidia.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": model,
+                "messages": messages,
+                "temperature": 0.2,
+                "max_tokens": 4096
+            },
+            timeout=120.0
+        )
+        if resp.status_code >= 400:
+            error_msg = f"NVIDIA API Error {resp.status_code}: {resp.text}"
+            print(error_msg)
+            raise Exception(error_msg)
+            
+        resp.raise_for_status()
+        choice = resp.json()["choices"][0]["message"]
+        return choice.get("content") or choice.get("reasoning") or ""
+    except Exception as e:
+        print(f"NVIDIA API error with {model}: {e}")
+        raise e
+
 # --- Existing Endpoints ---
 def call_groq(messages: list, model: str = PRIMARY_MODEL) -> str:
     import httpx
@@ -289,40 +326,64 @@ def call_groq(messages: list, model: str = PRIMARY_MODEL) -> str:
         print(f"Groq API error with {model}: {e}")
         raise e
 
+def call_llm(messages: list, groq_model: str = PRIMARY_MODEL) -> str:
+    """Unified LLM router: Uses NVIDIA Nemotron Reasoning if NVIDIA_API_KEY is configured; falls back to Groq."""
+    if os.environ.get("NVIDIA_API_KEY"):
+        try:
+            print(f"Executing request with NVIDIA NIM ({NVIDIA_MODEL})...")
+            return call_nvidia(messages, model=NVIDIA_MODEL)
+        except Exception as e:
+            print(f"NVIDIA request failed: {e}. Falling back to Groq...")
+
+    try:
+        return call_groq(messages, model=groq_model)
+    except Exception as e:
+        if groq_model != FALLBACK_MODEL:
+            print(f"Groq {groq_model} failed: {e}. Retrying with Groq fallback {FALLBACK_MODEL}...")
+            return call_groq(messages, model=FALLBACK_MODEL)
+        raise e
+
 def _run_search(query: str) -> str:
     import httpx
     
-    # Primary: DuckDuckGo (Free, no API key)
+    clean_query = query.strip()
+    search_query = f"{clean_query} -site:justdial.com -site:facebook.com"
+    
+    # Priority 1: Serper API (Google Search) for high-fidelity research
+    api_key = os.environ.get("SERPER_API_KEY", "")
+    if api_key:
+        try:
+            print("Executing primary search with Serper (Google Search API)...")
+            resp = httpx.post(
+                "https://google.serper.dev/search",
+                headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+                json={"q": search_query, "num": 10},
+                timeout=30,
+            )
+            data = resp.json()
+            results = []
+            for r in data.get("organic", [])[:8]:
+                results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
+            if results:
+                return "\n\n".join(results)
+        except Exception as e:
+            print(f"Serper search failed: {e}. Falling back to DuckDuckGo...")
+    
+    # Priority 2: DuckDuckGo (Free fallback)
     try:
+        print("Executing search with DuckDuckGo...")
         from duckduckgo_search import DDGS
         results = []
         with DDGS() as ddgs:
-            ddg_results = list(ddgs.text(query, max_results=8))
+            ddg_results = list(ddgs.text(search_query, max_results=8))
         if ddg_results:
             for r in ddg_results:
                 results.append(f"**{r.get('title','')}**\n{r.get('body','')}\nURL: {r.get('href','')}")
             return "\n\n".join(results)
     except Exception as e:
-        print(f"DuckDuckGo search failed: {e}. Falling back to Serper...")
+        print(f"DuckDuckGo search failed: {e}")
         
-    # Fallback: Serper API
-    api_key = os.environ.get("SERPER_API_KEY", "")
-    if not api_key:
-        return "Error: DuckDuckGo failed and SERPER_API_KEY not set for fallback."
-    try:
-        resp = httpx.post(
-            "https://google.serper.dev/search",
-            headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
-            json={"q": query, "num": 10},
-            timeout=30,
-        )
-        data = resp.json()
-        results = []
-        for r in data.get("organic", [])[:8]:
-            results.append(f"**{r.get('title','')}**\n{r.get('snippet','')}\nURL: {r.get('link','')}")
-        return "\n\n".join(results) or "No results found"
-    except Exception as e:
-        return f"Search error: {e}"
+    return "No results found"
 
 def run_crewai(topic: str, context_messages: list = None):
     context_str = ""
@@ -334,82 +395,64 @@ def run_crewai(topic: str, context_messages: list = None):
             context_str += f"{role_name} {action}\n{msg['content']}\n\n"
         context_str += f"Current Question: {topic}\n\n"
 
-    def execute(model_name):
-        # 1. Search the web
-        search_results = _run_search(topic)
+    # 1. Search the web
+    search_results = _run_search(topic)
 
-        # 2. Researcher Agent
-        researcher_prompt = (
-            f"You are a Senior Researcher with a keen eye for detail.\n"
-            f"Your goal is to thoroughly research the topic: {topic}\n\n"
-            f"{context_str}"
-            f"Conduct comprehensive research on the exact topic based on the user's words.\n"
-            f"Gather essential facts, history, relevant details, and the EXACT URLs/sources you used.\n\n"
-            f"Here are the search results from the web:\n{search_results}\n\n"
-            f"Write a structured report containing the most relevant and accurate facts, context, and details about the topic, including a precise list of the raw URLs used as sources."
-        )
-        print(f"Running Researcher on {model_name}...")
-        research_report = call_groq([{"role": "user", "content": researcher_prompt}], model=model_name)
+    # 2. Researcher Agent
+    researcher_prompt = (
+        f"You are a Senior Corporate & Technical Intelligence Analyst.\n"
+        f"Your goal is to conduct an in-depth, rigorous research dossier on: {topic}\n\n"
+        f"{context_str}"
+        f"Focus on verified corporate facts, official portals, products/services, technologies, architecture, and regulatory/commercial footprint.\n"
+        f"IGNORE generic directory review websites (like Justdial, Yelp) and social media snippets.\n"
+        f"Gather essential facts, history, relevant details, and the EXACT URLs/sources you used.\n\n"
+        f"Here are the search results from the web:\n{search_results}\n\n"
+        f"Write an exhaustive, structured fact-sheet including official products, business model, and raw URLs used."
+    )
+    print("Running Researcher Agent...")
+    research_report = call_llm([{"role": "user", "content": researcher_prompt}])
 
-        # 3. Writer Agent
-        writer_prompt = (
-            f"You are a Versatile Writer, known for adapting your tone to the subject matter.\n"
-            f"Your goal is to write an engaging and highly accurate article based on the provided research.\n\n"
-            f"Here is the research report:\n{research_report}\n\n"
-            f"Write a well-structured, engaging article about '{topic}' based entirely on the researcher's report. Ensure the tone matches the subject matter. You MUST append a 'References' section at the very end citing the specific sources. Every reference MUST be formatted as a clickable Markdown link using the format: [Source Title](URL). Do not just list the titles; you must include the full URL."
-        )
-        print(f"Running Writer on {model_name}...")
-        final_article = call_groq([{"role": "user", "content": writer_prompt}], model=model_name)
-        return final_article
-
-    try:
-        return execute(PRIMARY_MODEL)
-    except Exception as e:
-        print(f"Primary model {PRIMARY_MODEL} failed: {e}. Retrying with fallback {FALLBACK_MODEL}.")
-        return execute(FALLBACK_MODEL)
+    # 3. Writer Agent
+    writer_prompt = (
+        f"You are a Senior Research Analyst.\n"
+        f"Your goal is to write an authoritative, boardroom-ready, cited report on '{topic}' based on the researcher's findings.\n\n"
+        f"Here is the research report:\n{research_report}\n\n"
+        f"Write a comprehensive report structured with Executive Summary, Core Offerings/Technology, Business Architecture, Key Findings, and Strategic Takeaways.\n"
+        f"Maintain an objective, analytical tone. Do NOT use conversational blog intros (e.g., do not say 'Have you ever wondered...' or 'Do you want general information...').\n"
+        f"You MUST append a 'References' section at the very end citing the specific sources. Every reference MUST be formatted as a clickable Markdown link using the format: [Source Title](URL)."
+    )
+    print("Running Writer Agent...")
+    final_article = call_llm([{"role": "user", "content": writer_prompt}])
+    return final_article
 
 def run_clarification_check(topic: str):
-    def execute(model_name):
-        evaluator_prompt = (
-            f"You are a Query Evaluator, an expert at understanding user intent.\n"
-            f"Your goal is to determine if a user's query is highly ambiguous and needs clarification.\n\n"
-            f"Evaluate this query: '{topic}'. If it is highly ambiguous (e.g., a single word with multiple meanings like 'Apple', or gibberish), provide 2-4 specific clarification options. If it is a standard query, return 'CLEAR'. Respond ONLY with valid JSON format: {{\"status\": \"clear\"}} OR {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}"
-        )
-        result = call_groq([{"role": "user", "content": evaluator_prompt}], model=model_name)
-        
+    evaluator_prompt = (
+        f"You are a Query Evaluator, an expert at understanding user intent.\n"
+        f"Your goal is to determine if a user's query is highly ambiguous and needs clarification.\n\n"
+        f"Evaluate this query: '{topic}'. If it is highly ambiguous (e.g., a single word with multiple meanings like 'Apple', or gibberish), provide 2-4 specific clarification options. If it is a standard query, return 'CLEAR'. Respond ONLY with valid JSON format: {{\"status\": \"clear\"}} OR {{\"status\": \"clarification_needed\", \"options\": [\"Option 1\", \"Option 2\"]}}"
+    )
+    try:
+        result = call_llm([{"role": "user", "content": evaluator_prompt}])
         # Extract JSON from potential markdown blocks
         if "```json" in result:
             result = result.split("```json")[1].split("```")[0]
         elif "```" in result:
             result = result.split("```")[1].split("```")[0]
         return json.loads(result.strip())
-        
-    try:
-        return execute(PRIMARY_MODEL)
     except Exception as e:
-        print(f"Primary model {PRIMARY_MODEL} failed in run_clarification_check: {e}. Retrying with fallback {FALLBACK_MODEL}.")
-        try:
-            return execute(FALLBACK_MODEL)
-        except Exception:
-            return {"status": "clear"} # fallback
+        print(f"Clarification check fallback triggered: {e}")
+        return {"status": "clear"}
 
 def run_revision(topic: str, current_report: str, feedback: str):
-    def execute(model_name):
-        editor_prompt = (
-            f"You are an Expert Editor. You are a skilled editor who can adapt existing content flawlessly to meet new requirements while retaining accuracy.\n"
-            f"Your goal is to revise the report based on user feedback.\n\n"
-            f"Topic: {topic}\n\n"
-            f"Current Report:\n{current_report}\n\n"
-            f"User Feedback: {feedback}\n\n"
-            f"Rewrite the report to incorporate the user's feedback. Output ONLY the revised markdown content."
-        )
-        return call_groq([{"role": "user", "content": editor_prompt}], model=model_name)
-        
-    try:
-        return execute(PRIMARY_MODEL)
-    except Exception as e:
-        print(f"Primary model {PRIMARY_MODEL} failed in run_revision: {e}. Retrying with fallback {FALLBACK_MODEL}.")
-        return execute(FALLBACK_MODEL)
+    editor_prompt = (
+        f"You are an Expert Editor. You are a skilled editor who can adapt existing content flawlessly to meet new requirements while retaining accuracy.\n\n"
+        f"Topic: {topic}\n\n"
+        f"Current Report:\n{current_report}\n\n"
+        f"User Feedback: {feedback}\n\n"
+        f"Rewrite the report to incorporate the user's feedback. Output ONLY the revised markdown content."
+    )
+    return call_llm([{"role": "user", "content": editor_prompt}])
+
 
 @app.post("/api/research")
 async def research_topic(request: ResearchRequest, user_id: str = Depends(get_current_user)):

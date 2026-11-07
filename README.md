@@ -2,16 +2,16 @@
 
 Developed an AI-powered research application using multi-agent workflows to generate detailed, cited reports from user queries, with authentication, conversation memory, clarification handling, caching, revision-based editing, and PDF/Word/Image export. 
 
-Built with blazing-fast **Groq** AI, **Supabase** authentication, and hosted on **Vercel**.
+Built with **NVIDIA NIM** (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`), **Google Serper API**, **Supabase** authentication, and hosted on **Vercel**.
 
 ![UI Preview](https://img.shields.io/badge/UI-Glassmorphism-blue)
 ![Python](https://img.shields.io/badge/Python-FastAPI-3776AB?logo=python&logoColor=white)
-![AI](https://img.shields.io/badge/AI-Groq%20AI-F9A03F)
+![AI](https://img.shields.io/badge/AI-NVIDIA%20Nemotron%20Reasoning-76B900?logo=nvidia&logoColor=white)
 
 ## ✨ Features
 
-- ⚡ **Blazing Fast AI:** Powered by Groq's high-speed inference using `openai/gpt-oss-120b` with automated fallback to `openai/gpt-oss-20b`.
-- 🌍 **Live Web Search:** Integrated with DuckDuckGo (Primary, completely free) and Serper API (Fallback) for real-time information gathering.
+- ⚡ **Reasoning AI:** Powered by NVIDIA's `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` via NVIDIA NIM (with automated Groq fallback).
+- 🌍 **Institutional Google Search:** Powered by **Serper API** (Primary) with DuckDuckGo fallback and automated noise-filtering for directory scrapers.
 - 🔒 **Secure User Accounts:** Full authentication and private research history powered by Supabase.
 - 📱 **Fully Responsive:** A beautiful, responsive glassmorphism UI that looks perfect on desktops, tablets, and phones.
 - 📄 **Rich Exports:** Download your research reports instantly as a **PDF**, **Word Document**, or **Image**.
@@ -23,7 +23,7 @@ Built with blazing-fast **Groq** AI, **Supabase** authentication, and hosted on 
 - **Frontend:** Vanilla JavaScript, HTML5, CSS3 (No heavy frontend frameworks)
 - **Backend:** Python, FastAPI
 - **Database & Auth:** Supabase (PostgreSQL)
-- **AI Models:** Groq API
+- **AI Models:** NVIDIA NIM (Nemotron-3 Nano Omni 30B Reasoning)
 - **Deployment:** Vercel (Serverless Functions)
 
 ## 🚀 Local Development Setup
