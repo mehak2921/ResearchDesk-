@@ -1,4 +1,4 @@
-﻿# 🔬 The Research Desk
+# 🔬 The Research Desk
 
 Developed an AI-powered research application using multi-agent workflows to generate detailed, cited reports from user queries, with authentication, conversation memory, clarification handling, caching, revision-based editing, and PDF/Word/Image export. 
 
@@ -6,11 +6,11 @@ Built with blazing-fast **Groq** AI, **Supabase** authentication, and hosted on 
 
 ![UI Preview](https://img.shields.io/badge/UI-Glassmorphism-blue)
 ![Python](https://img.shields.io/badge/Python-FastAPI-3776AB?logo=python&logoColor=white)
-![AI](https://img.shields.io/badge/AI-Groq%20Llama%203-F9A03F)
+![AI](https://img.shields.io/badge/AI-Groq%20AI-F9A03F)
 
 ## ✨ Features
 
-- ⚡ **Blazing Fast AI:** Powered by Groq's high-speed inference using gpt-oss-120b and llama-3.3-70b-versatile.
+- ⚡ **Blazing Fast AI:** Powered by Groq's high-speed inference using `openai/gpt-oss-120b` with automated fallback to `openai/gpt-oss-20b`.
 - 🌍 **Live Web Search:** Integrated with DuckDuckGo (Primary, completely free) and Serper API (Fallback) for real-time information gathering.
 - 🔒 **Secure User Accounts:** Full authentication and private research history powered by Supabase.
 - 📱 **Fully Responsive:** A beautiful, responsive glassmorphism UI that looks perfect on desktops, tablets, and phones.

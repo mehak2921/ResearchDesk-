@@ -255,8 +255,11 @@ def list_models():
     resp = httpx.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {api_key}"})
     return resp.json()
 
+PRIMARY_MODEL = os.environ.get("GROQ_PRIMARY_MODEL", "openai/gpt-oss-120b")
+FALLBACK_MODEL = os.environ.get("GROQ_FALLBACK_MODEL", "openai/gpt-oss-20b")
+
 # --- Existing Endpoints ---
-def call_groq(messages: list, model: str = "openai/gpt-oss-120b") -> str:
+def call_groq(messages: list, model: str = PRIMARY_MODEL) -> str:
     import httpx
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -280,7 +283,8 @@ def call_groq(messages: list, model: str = "openai/gpt-oss-120b") -> str:
             raise Exception(error_msg)
             
         resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        choice = resp.json()["choices"][0]["message"]
+        return choice.get("content") or choice.get("reasoning") or ""
     except Exception as e:
         print(f"Groq API error with {model}: {e}")
         raise e
@@ -359,10 +363,10 @@ def run_crewai(topic: str, context_messages: list = None):
         return final_article
 
     try:
-        return execute("openai/gpt-oss-120b")
+        return execute(PRIMARY_MODEL)
     except Exception as e:
-        print(f"Primary model failed: {e}. Retrying with fallback.")
-        return execute("llama-3.3-70b-versatile")
+        print(f"Primary model {PRIMARY_MODEL} failed: {e}. Retrying with fallback {FALLBACK_MODEL}.")
+        return execute(FALLBACK_MODEL)
 
 def run_clarification_check(topic: str):
     def execute(model_name):
@@ -381,11 +385,11 @@ def run_clarification_check(topic: str):
         return json.loads(result.strip())
         
     try:
-        return execute("openai/gpt-oss-120b")
+        return execute(PRIMARY_MODEL)
     except Exception as e:
-        print(f"Primary model failed in run_clarification_check: {e}. Retrying with fallback.")
+        print(f"Primary model {PRIMARY_MODEL} failed in run_clarification_check: {e}. Retrying with fallback {FALLBACK_MODEL}.")
         try:
-            return execute("llama-3.3-70b-versatile")
+            return execute(FALLBACK_MODEL)
         except Exception:
             return {"status": "clear"} # fallback
 
@@ -402,10 +406,10 @@ def run_revision(topic: str, current_report: str, feedback: str):
         return call_groq([{"role": "user", "content": editor_prompt}], model=model_name)
         
     try:
-        return execute("openai/gpt-oss-120b")
+        return execute(PRIMARY_MODEL)
     except Exception as e:
-        print(f"Primary model failed in run_revision: {e}. Retrying with fallback.")
-        return execute("llama-3.3-70b-versatile")
+        print(f"Primary model {PRIMARY_MODEL} failed in run_revision: {e}. Retrying with fallback {FALLBACK_MODEL}.")
+        return execute(FALLBACK_MODEL)
 
 @app.post("/api/research")
 async def research_topic(request: ResearchRequest, user_id: str = Depends(get_current_user)):
