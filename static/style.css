@@ -1072,23 +1072,32 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* ========================================================
-   HIGH-FIDELITY PDF EXPORT STYLES (Print & html2pdf)
+   HIGH-FIDELITY PDF EXPORT STYLES (Light Mode Document)
    ======================================================== */
 .pdf-render-container {
-    width: 760px !important;
+    width: 750px !important;
     background-color: #ffffff !important;
     color: #1e293b !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     font-size: 13px !important;
     line-height: 1.65 !important;
     box-sizing: border-box !important;
-    padding: 28px 32px !important;
+    padding: 24px 28px !important;
+    margin: 0 !important;
+}
+
+.pdf-render-container,
+.pdf-render-container * {
+    color: #1e293b !important;
+    text-shadow: none !important;
     box-shadow: none !important;
-    border: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    -webkit-text-fill-color: initial !important;
 }
 
 .pdf-header {
-    margin-bottom: 20px !important;
+    margin-bottom: 18px !important;
     page-break-after: avoid !important;
     break-after: avoid !important;
 }
@@ -1097,7 +1106,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
 }
 
 .pdf-brand-name {
@@ -1108,7 +1117,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pdf-badge {
-    background: #e0e7ff !important;
+    background-color: #e0e7ff !important;
     color: #4338ca !important;
     font-size: 10px !important;
     font-weight: 700 !important;
@@ -1123,7 +1132,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 800 !important;
     color: #0f172a !important;
     line-height: 1.25 !important;
-    margin: 8px 0 10px 0 !important;
+    margin: 6px 0 8px 0 !important;
     font-family: 'Outfit', sans-serif !important;
 }
 
@@ -1137,15 +1146,20 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500 !important;
 }
 
+.pdf-meta * {
+    color: #64748b !important;
+}
+
 .pdf-divider {
     height: 2px !important;
-    background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%) !important;
-    margin: 12px 0 18px 0 !important;
+    background: #6366f1 !important;
+    margin: 10px 0 16px 0 !important;
     border-radius: 2px !important;
+    border: none !important;
 }
 
 .pdf-body-content {
-    color: #334155 !important;
+    color: #1e293b !important;
 }
 
 .pdf-body-content h1 {
@@ -1163,8 +1177,8 @@ h1, h2, h3, h4, h5, h6 {
 .pdf-body-content h2 {
     font-size: 15px !important;
     font-weight: 700 !important;
-    color: #1e293b !important;
-    margin: 16px 0 8px 0 !important;
+    color: #0f172a !important;
+    margin: 16px 0 6px 0 !important;
     page-break-after: avoid !important;
     break-after: avoid !important;
     font-family: 'Outfit', sans-serif !important;
@@ -1173,8 +1187,8 @@ h1, h2, h3, h4, h5, h6 {
 .pdf-body-content h3 {
     font-size: 13.5px !important;
     font-weight: 600 !important;
-    color: #334155 !important;
-    margin: 14px 0 6px 0 !important;
+    color: #1e293b !important;
+    margin: 12px 0 4px 0 !important;
     page-break-after: avoid !important;
     break-after: avoid !important;
     font-family: 'Outfit', sans-serif !important;
@@ -1185,6 +1199,12 @@ h1, h2, h3, h4, h5, h6 {
     color: #334155 !important;
     line-height: 1.65 !important;
     margin-bottom: 10px !important;
+}
+
+.pdf-body-content strong,
+.pdf-body-content b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
 }
 
 .pdf-body-content ul, 
@@ -1200,12 +1220,6 @@ h1, h2, h3, h4, h5, h6 {
     color: #334155 !important;
 }
 
-.pdf-body-content strong {
-    color: #0f172a !important;
-    font-weight: 700 !important;
-}
-
-/* FIX TABLES FOR PDF PRINT: Proper table layout with wrapping */
 .pdf-body-content table {
     display: table !important;
     width: 100% !important;
@@ -1214,7 +1228,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 10.5px !important;
     table-layout: auto !important;
     white-space: normal !important;
-    page-break-inside: auto !important;
 }
 
 .pdf-body-content thead {
@@ -1262,8 +1275,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pdf-body-content pre {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
     padding: 10px !important;
     border-radius: 6px !important;
     font-size: 10px !important;
@@ -1306,6 +1320,10 @@ h1, h2, h3, h4, h5, h6 {
     display: flex !important;
     justify-content: space-between !important;
     font-size: 9.5px !important;
+    color: #94a3b8 !important;
+}
+
+.pdf-footer-text * {
     color: #94a3b8 !important;
 }
 

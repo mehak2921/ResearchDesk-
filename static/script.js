@@ -1137,13 +1137,16 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadPdfBtn.innerHTML = '<i class="ph ph-spinner-gap spin"></i> Generating...';
         downloadPdfBtn.disabled = true;
 
-        // Create an isolated, dedicated offscreen render container
+        // Create an isolated container rendered at top of page behind the background
         const printContainer = document.createElement('div');
         printContainer.className = 'pdf-render-container';
-        printContainer.style.position = 'fixed';
-        printContainer.style.left = '-9999px';
+        printContainer.style.position = 'absolute';
+        printContainer.style.left = '0';
         printContainer.style.top = '0';
+        printContainer.style.width = '750px';
+        printContainer.style.backgroundColor = '#ffffff';
         printContainer.style.zIndex = '-9999';
+        printContainer.style.visibility = 'visible';
 
         const today = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -1163,15 +1166,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="pdf-brand-name">🔬 The Research Desk</span>
                     <span class="pdf-badge">Executive Research Dossier</span>
                 </div>
-                <h1 class="pdf-report-title">${safeTitle}</h1>
-                <div class="pdf-meta">
+                <h1 class="pdf-report-title" style="color: #0f172a !important; font-weight: 800 !important; font-size: 22px !important; margin: 6px 0 8px 0 !important;">${safeTitle}</h1>
+                <div class="pdf-meta" style="color: #64748b !important; font-size: 11px !important;">
                     <span>📅 Date: ${today}</span>
                     <span>•</span>
                     <span>⚡ Engine: Autonomous AI Intelligence</span>
                     <span>•</span>
                     <span>🔒 Verified & Cited</span>
                 </div>
-                <div class="pdf-divider"></div>
+                <div class="pdf-divider" style="height: 2px !important; background: #6366f1 !important; margin: 10px 0 16px 0 !important;"></div>
             </div>
         `;
 
@@ -1179,20 +1182,61 @@ document.addEventListener('DOMContentLoaded', () => {
         bodyClone.className = 'pdf-body-content';
         bodyClone.innerHTML = reportContent.innerHTML;
 
-        // Ensure table wrapping and proper display inside print container
+        // INLINE STYLE PASS: Ensure total immunity from dark-mode CSS inheritance
+        bodyClone.querySelectorAll('p, li, span').forEach(el => {
+            el.style.setProperty('color', '#334155', 'important');
+            el.style.setProperty('font-size', '12px', 'important');
+            el.style.setProperty('line-height', '1.65', 'important');
+        });
+        bodyClone.querySelectorAll('h1, h2, h3, h4').forEach(el => {
+            el.style.setProperty('color', '#0f172a', 'important');
+            el.style.setProperty('font-weight', '700', 'important');
+            el.style.setProperty('break-after', 'avoid', 'important');
+            el.style.setProperty('page-break-after', 'avoid', 'important');
+        });
+        bodyClone.querySelectorAll('strong, b').forEach(el => {
+            el.style.setProperty('color', '#0f172a', 'important');
+            el.style.setProperty('font-weight', '700', 'important');
+        });
+        bodyClone.querySelectorAll('a').forEach(el => {
+            el.style.setProperty('color', '#2563eb', 'important');
+            el.style.setProperty('text-decoration', 'underline', 'important');
+        });
         bodyClone.querySelectorAll('table').forEach(tbl => {
-            tbl.style.display = 'table';
-            tbl.style.width = '100%';
-            tbl.style.tableLayout = 'auto';
-            tbl.style.whiteSpace = 'normal';
+            tbl.style.setProperty('display', 'table', 'important');
+            tbl.style.setProperty('width', '100%', 'important');
+            tbl.style.setProperty('table-layout', 'auto', 'important');
+            tbl.style.setProperty('white-space', 'normal', 'important');
+            tbl.style.setProperty('border-collapse', 'collapse', 'important');
+            tbl.style.setProperty('margin', '14px 0', 'important');
+        });
+        bodyClone.querySelectorAll('th').forEach(el => {
+            el.style.setProperty('background-color', '#f1f5f9', 'important');
+            el.style.setProperty('color', '#0f172a', 'important');
+            el.style.setProperty('font-weight', '700', 'important');
+            el.style.setProperty('padding', '7px 9px', 'important');
+            el.style.setProperty('border', '1px solid #cbd5e1', 'important');
+        });
+        bodyClone.querySelectorAll('td').forEach(el => {
+            el.style.setProperty('color', '#334155', 'important');
+            el.style.setProperty('padding', '6px 9px', 'important');
+            el.style.setProperty('border', '1px solid #e2e8f0', 'important');
+            el.style.setProperty('white-space', 'normal', 'important');
+            el.style.setProperty('word-break', 'break-word', 'important');
+        });
+        bodyClone.querySelectorAll('blockquote').forEach(el => {
+            el.style.setProperty('border-left', '4px solid #6366f1', 'important');
+            el.style.setProperty('background-color', '#f8fafc', 'important');
+            el.style.setProperty('padding', '8px 14px', 'important');
+            el.style.setProperty('color', '#475569', 'important');
         });
 
         const footerHTML = `
-            <div class="pdf-footer">
-                <div class="pdf-divider"></div>
-                <div class="pdf-footer-text">
-                    <span>The Research Desk — Autonomous Multi-Agent Research Platform</span>
-                    <span>Confidential • Citations Grounded</span>
+            <div class="pdf-footer" style="margin-top: 24px !important;">
+                <div class="pdf-divider" style="height: 1px !important; background: #e2e8f0 !important; margin-bottom: 8px !important;"></div>
+                <div class="pdf-footer-text" style="display: flex !important; justify-content: space-between !important; font-size: 9.5px !important; color: #94a3b8 !important;">
+                    <span style="color: #94a3b8 !important;">The Research Desk — Autonomous Multi-Agent Research Platform</span>
+                    <span style="color: #94a3b8 !important;">Confidential • Citations Grounded</span>
                 </div>
             </div>
         `;
@@ -1214,7 +1258,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 useCORS: true, 
                 logging: false,
                 backgroundColor: '#ffffff',
-                windowWidth: 760
+                windowWidth: 750,
+                scrollY: 0,
+                scrollX: 0
             },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak:    { 
