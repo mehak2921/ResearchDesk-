@@ -1137,16 +1137,15 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadPdfBtn.innerHTML = '<i class="ph ph-spinner-gap spin"></i> Generating...';
         downloadPdfBtn.disabled = true;
 
-        // Create an isolated container rendered at top of page behind the background
-        const printContainer = document.createElement('div');
-        printContainer.className = 'pdf-render-container';
-        printContainer.style.position = 'absolute';
-        printContainer.style.left = '0';
-        printContainer.style.top = '0';
-        printContainer.style.width = '750px';
-        printContainer.style.backgroundColor = '#ffffff';
-        printContainer.style.zIndex = '-9999';
-        printContainer.style.visibility = 'visible';
+        // Create standalone report document clone
+        const clone = document.createElement('div');
+        clone.style.backgroundColor = '#ffffff';
+        clone.style.color = '#1e293b';
+        clone.style.padding = '20px 24px';
+        clone.style.fontFamily = "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+        clone.style.fontSize = '12.5px';
+        clone.style.lineHeight = '1.65';
+        clone.style.boxSizing = 'border-box';
 
         const today = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -1160,124 +1159,175 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
 
-        const headerHTML = `
-            <div class="pdf-header">
-                <div class="pdf-brand">
-                    <span class="pdf-brand-name">🔬 The Research Desk</span>
-                    <span class="pdf-badge">Executive Research Dossier</span>
-                </div>
-                <h1 class="pdf-report-title" style="color: #0f172a !important; font-weight: 800 !important; font-size: 22px !important; margin: 6px 0 8px 0 !important;">${safeTitle}</h1>
-                <div class="pdf-meta" style="color: #64748b !important; font-size: 11px !important;">
-                    <span>📅 Date: ${today}</span>
-                    <span>•</span>
-                    <span>⚡ Engine: Autonomous AI Intelligence</span>
-                    <span>•</span>
-                    <span>🔒 Verified & Cited</span>
-                </div>
-                <div class="pdf-divider" style="height: 2px !important; background: #6366f1 !important; margin: 10px 0 16px 0 !important;"></div>
+        // Header block
+        const headerDiv = document.createElement('div');
+        headerDiv.style.marginBottom = '18px';
+        headerDiv.style.paddingBottom = '12px';
+        headerDiv.style.borderBottom = '2px solid #6366f1';
+        headerDiv.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-size: 14px; font-weight: 700; color: #0f172a;">🔬 The Research Desk</span>
+                <span style="font-size: 10px; font-weight: 700; background-color: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 10px;">EXECUTIVE RESEARCH REPORT</span>
+            </div>
+            <h1 style="font-size: 21px; font-weight: 800; color: #0f172a; margin: 4px 0 6px 0; line-height: 1.25;">${safeTitle}</h1>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">
+                <span>📅 Date: ${today}</span> • <span>⚡ Engine: Autonomous AI Intelligence</span> • <span>🔒 Grounded Citations</span>
             </div>
         `;
+        clone.appendChild(headerDiv);
 
-        const bodyClone = document.createElement('div');
-        bodyClone.className = 'pdf-body-content';
-        bodyClone.innerHTML = reportContent.innerHTML;
+        // Body content
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = reportContent.innerHTML;
 
-        // INLINE STYLE PASS: Ensure total immunity from dark-mode CSS inheritance
-        bodyClone.querySelectorAll('p, li, span').forEach(el => {
-            el.style.setProperty('color', '#334155', 'important');
-            el.style.setProperty('font-size', '12px', 'important');
-            el.style.setProperty('line-height', '1.65', 'important');
+        // Apply explicit dark high-contrast styles on ALL elements to prevent dark-mode inheritance
+        contentDiv.querySelectorAll('h1').forEach(el => {
+            el.style.color = '#0f172a';
+            el.style.fontSize = '18px';
+            el.style.fontWeight = '700';
+            el.style.marginTop = '20px';
+            el.style.marginBottom = '8px';
+            el.style.paddingBottom = '4px';
+            el.style.borderBottom = '1px solid #e2e8f0';
+            el.style.pageBreakAfter = 'avoid';
+            el.style.breakAfter = 'avoid';
         });
-        bodyClone.querySelectorAll('h1, h2, h3, h4').forEach(el => {
-            el.style.setProperty('color', '#0f172a', 'important');
-            el.style.setProperty('font-weight', '700', 'important');
-            el.style.setProperty('break-after', 'avoid', 'important');
-            el.style.setProperty('page-break-after', 'avoid', 'important');
+        contentDiv.querySelectorAll('h2').forEach(el => {
+            el.style.color = '#0f172a';
+            el.style.fontSize = '15px';
+            el.style.fontWeight = '700';
+            el.style.marginTop = '16px';
+            el.style.marginBottom = '6px';
+            el.style.pageBreakAfter = 'avoid';
+            el.style.breakAfter = 'avoid';
         });
-        bodyClone.querySelectorAll('strong, b').forEach(el => {
-            el.style.setProperty('color', '#0f172a', 'important');
-            el.style.setProperty('font-weight', '700', 'important');
+        contentDiv.querySelectorAll('h3, h4').forEach(el => {
+            el.style.color = '#1e293b';
+            el.style.fontSize = '13.5px';
+            el.style.fontWeight = '600';
+            el.style.marginTop = '12px';
+            el.style.marginBottom = '4px';
+            el.style.pageBreakAfter = 'avoid';
+            el.style.breakAfter = 'avoid';
         });
-        bodyClone.querySelectorAll('a').forEach(el => {
-            el.style.setProperty('color', '#2563eb', 'important');
-            el.style.setProperty('text-decoration', 'underline', 'important');
+        contentDiv.querySelectorAll('p').forEach(el => {
+            el.style.color = '#334155';
+            el.style.fontSize = '12px';
+            el.style.lineHeight = '1.65';
+            el.style.marginBottom = '10px';
         });
-        bodyClone.querySelectorAll('table').forEach(tbl => {
-            tbl.style.setProperty('display', 'table', 'important');
-            tbl.style.setProperty('width', '100%', 'important');
-            tbl.style.setProperty('table-layout', 'auto', 'important');
-            tbl.style.setProperty('white-space', 'normal', 'important');
-            tbl.style.setProperty('border-collapse', 'collapse', 'important');
-            tbl.style.setProperty('margin', '14px 0', 'important');
+        contentDiv.querySelectorAll('strong, b').forEach(el => {
+            el.style.color = '#0f172a';
+            el.style.fontWeight = '700';
         });
-        bodyClone.querySelectorAll('th').forEach(el => {
-            el.style.setProperty('background-color', '#f1f5f9', 'important');
-            el.style.setProperty('color', '#0f172a', 'important');
-            el.style.setProperty('font-weight', '700', 'important');
-            el.style.setProperty('padding', '7px 9px', 'important');
-            el.style.setProperty('border', '1px solid #cbd5e1', 'important');
+        contentDiv.querySelectorAll('ul, ol').forEach(el => {
+            el.style.color = '#334155';
+            el.style.margin = '6px 0 12px 20px';
         });
-        bodyClone.querySelectorAll('td').forEach(el => {
-            el.style.setProperty('color', '#334155', 'important');
-            el.style.setProperty('padding', '6px 9px', 'important');
-            el.style.setProperty('border', '1px solid #e2e8f0', 'important');
-            el.style.setProperty('white-space', 'normal', 'important');
-            el.style.setProperty('word-break', 'break-word', 'important');
+        contentDiv.querySelectorAll('li').forEach(el => {
+            el.style.color = '#334155';
+            el.style.fontSize = '12px';
+            el.style.lineHeight = '1.6';
+            el.style.marginBottom = '4px';
         });
-        bodyClone.querySelectorAll('blockquote').forEach(el => {
-            el.style.setProperty('border-left', '4px solid #6366f1', 'important');
-            el.style.setProperty('background-color', '#f8fafc', 'important');
-            el.style.setProperty('padding', '8px 14px', 'important');
-            el.style.setProperty('color', '#475569', 'important');
+        contentDiv.querySelectorAll('a').forEach(el => {
+            el.style.color = '#2563eb';
+            el.style.textDecoration = 'underline';
+            el.style.wordBreak = 'break-all';
+        });
+        contentDiv.querySelectorAll('table').forEach(tbl => {
+            tbl.style.display = 'table';
+            tbl.style.width = '100%';
+            tbl.style.borderCollapse = 'collapse';
+            tbl.style.margin = '14px 0';
+            tbl.style.fontSize = '10.5px';
+            tbl.style.tableLayout = 'auto';
+            tbl.style.whiteSpace = 'normal';
+        });
+        contentDiv.querySelectorAll('th').forEach(el => {
+            el.style.backgroundColor = '#f1f5f9';
+            el.style.color = '#0f172a';
+            el.style.fontWeight = '700';
+            el.style.padding = '7px 9px';
+            el.style.border = '1px solid #cbd5e1';
+            el.style.textAlign = 'left';
+            el.style.fontSize = '10.5px';
+        });
+        contentDiv.querySelectorAll('td').forEach(el => {
+            el.style.color = '#334155';
+            el.style.padding = '6px 9px';
+            el.style.border = '1px solid #e2e8f0';
+            el.style.fontSize = '10px';
+            el.style.lineHeight = '1.4';
+            el.style.wordBreak = 'break-word';
+        });
+        contentDiv.querySelectorAll('blockquote').forEach(el => {
+            el.style.borderLeft = '4px solid #6366f1';
+            el.style.backgroundColor = '#f8fafc';
+            el.style.padding = '8px 12px';
+            el.style.margin = '10px 0';
+            el.style.color = '#475569';
+            el.style.fontStyle = 'italic';
+            el.style.pageBreakInside = 'avoid';
+            el.style.breakInside = 'avoid';
+        });
+        contentDiv.querySelectorAll('pre').forEach(el => {
+            el.style.backgroundColor = '#f8fafc';
+            el.style.border = '1px solid #e2e8f0';
+            el.style.color = '#0f172a';
+            el.style.padding = '10px';
+            el.style.borderRadius = '6px';
+            el.style.fontSize = '10px';
+            el.style.overflowX = 'hidden';
+            el.style.whiteSpace = 'pre-wrap';
+            el.style.wordBreak = 'break-word';
+            el.style.margin = '10px 0';
+            el.style.pageBreakInside = 'avoid';
+            el.style.breakInside = 'avoid';
+        });
+        contentDiv.querySelectorAll('code').forEach(el => {
+            el.style.backgroundColor = '#f1f5f9';
+            el.style.color = '#0f172a';
+            el.style.padding = '2px 4px';
+            el.style.borderRadius = '3px';
+            el.style.fontSize = '10.5px';
+            el.style.fontFamily = 'monospace';
         });
 
-        const footerHTML = `
-            <div class="pdf-footer" style="margin-top: 24px !important;">
-                <div class="pdf-divider" style="height: 1px !important; background: #e2e8f0 !important; margin-bottom: 8px !important;"></div>
-                <div class="pdf-footer-text" style="display: flex !important; justify-content: space-between !important; font-size: 9.5px !important; color: #94a3b8 !important;">
-                    <span style="color: #94a3b8 !important;">The Research Desk — Autonomous Multi-Agent Research Platform</span>
-                    <span style="color: #94a3b8 !important;">Confidential • Citations Grounded</span>
-                </div>
-            </div>
+        clone.appendChild(contentDiv);
+
+        // Footer block
+        const footerDiv = document.createElement('div');
+        footerDiv.style.marginTop = '24px';
+        footerDiv.style.paddingTop = '8px';
+        footerDiv.style.borderTop = '1px solid #e2e8f0';
+        footerDiv.style.display = 'flex';
+        footerDiv.style.justifyContent = 'space-between';
+        footerDiv.style.fontSize = '9.5px';
+        footerDiv.style.color = '#94a3b8';
+        footerDiv.innerHTML = `
+            <span>The Research Desk — Autonomous Multi-Agent Research Platform</span>
+            <span>Confidential • Citations Grounded</span>
         `;
-
-        printContainer.innerHTML = headerHTML;
-        printContainer.appendChild(bodyClone);
-        printContainer.insertAdjacentHTML('beforeend', footerHTML);
-
-        document.body.appendChild(printContainer);
+        clone.appendChild(footerDiv);
 
         const safeFilename = `${(currentTopic || 'research_report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report.pdf`;
 
         const opt = {
-            margin:       [10, 10, 12, 10], // top, left, bottom, right in mm
+            margin:       10, // 10mm margins
             filename:     safeFilename,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true, 
-                logging: false,
-                backgroundColor: '#ffffff',
-                windowWidth: 750,
-                scrollY: 0,
-                scrollX: 0
-            },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { 
-                mode: ['css', 'legacy'], 
-                avoid: ['.pdf-header', '.pdf-footer', 'tr', 'h1', 'h2', 'h3', 'blockquote', 'pre'] 
-            }
+            pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', 'h1', 'h2', 'h3', 'blockquote', 'pre'] }
         };
 
         try {
-            await html2pdf().set(opt).from(printContainer).save();
+            await html2pdf().set(opt).from(clone).save();
         } catch (err) {
             console.error('PDF generation error:', err);
             alert('Failed to generate PDF. Please try again.');
         } finally {
-            if (document.body.contains(printContainer)) {
-                printContainer.remove();
-            }
             downloadPdfBtn.innerHTML = originalBtnHTML;
             downloadPdfBtn.disabled = false;
         }
