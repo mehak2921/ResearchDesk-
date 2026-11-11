@@ -1127,18 +1127,114 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    downloadPdfBtn.addEventListener('click', () => {
+    downloadPdfBtn.addEventListener('click', async () => {
+        if (!reportContent || !reportContent.innerHTML.trim()) {
+            alert("No report content available to export.");
+            return;
+        }
+
+        const originalBtnHTML = downloadPdfBtn.innerHTML;
+        downloadPdfBtn.innerHTML = '<i class="ph ph-spinner-gap spin"></i> Generating...';
+        downloadPdfBtn.disabled = true;
+
+        // Create an isolated, dedicated offscreen render container
+        const printContainer = document.createElement('div');
+        printContainer.className = 'pdf-render-container';
+        printContainer.style.position = 'fixed';
+        printContainer.style.left = '-9999px';
+        printContainer.style.top = '0';
+        printContainer.style.zIndex = '-9999';
+
+        const today = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        const safeTitle = (currentTopic || 'Research Report')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+        const headerHTML = `
+            <div class="pdf-header">
+                <div class="pdf-brand">
+                    <span class="pdf-brand-name">🔬 The Research Desk</span>
+                    <span class="pdf-badge">Executive Research Dossier</span>
+                </div>
+                <h1 class="pdf-report-title">${safeTitle}</h1>
+                <div class="pdf-meta">
+                    <span>📅 Date: ${today}</span>
+                    <span>•</span>
+                    <span>⚡ Engine: Autonomous AI Intelligence</span>
+                    <span>•</span>
+                    <span>🔒 Verified & Cited</span>
+                </div>
+                <div class="pdf-divider"></div>
+            </div>
+        `;
+
+        const bodyClone = document.createElement('div');
+        bodyClone.className = 'pdf-body-content';
+        bodyClone.innerHTML = reportContent.innerHTML;
+
+        // Ensure table wrapping and proper display inside print container
+        bodyClone.querySelectorAll('table').forEach(tbl => {
+            tbl.style.display = 'table';
+            tbl.style.width = '100%';
+            tbl.style.tableLayout = 'auto';
+            tbl.style.whiteSpace = 'normal';
+        });
+
+        const footerHTML = `
+            <div class="pdf-footer">
+                <div class="pdf-divider"></div>
+                <div class="pdf-footer-text">
+                    <span>The Research Desk — Autonomous Multi-Agent Research Platform</span>
+                    <span>Confidential • Citations Grounded</span>
+                </div>
+            </div>
+        `;
+
+        printContainer.innerHTML = headerHTML;
+        printContainer.appendChild(bodyClone);
+        printContainer.insertAdjacentHTML('beforeend', footerHTML);
+
+        document.body.appendChild(printContainer);
+
+        const safeFilename = `${(currentTopic || 'research_report').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report.pdf`;
+
         const opt = {
-            margin:       10,
-            filename:     `${currentTopic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report.pdf`,
+            margin:       [10, 10, 12, 10], // top, left, bottom, right in mm
+            filename:     safeFilename,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true, 
+                logging: false,
+                backgroundColor: '#ffffff',
+                windowWidth: 760
+            },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: 'css', avoid: ['tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'li'] }
+            pagebreak:    { 
+                mode: ['css', 'legacy'], 
+                avoid: ['.pdf-header', '.pdf-footer', 'tr', 'h1', 'h2', 'h3', 'blockquote', 'pre'] 
+            }
         };
-        const clone = reportContent.cloneNode(true);
-        clone.classList.add('pdf-export');
-        html2pdf().set(opt).from(clone).save();
+
+        try {
+            await html2pdf().set(opt).from(printContainer).save();
+        } catch (err) {
+            console.error('PDF generation error:', err);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            if (document.body.contains(printContainer)) {
+                printContainer.remove();
+            }
+            downloadPdfBtn.innerHTML = originalBtnHTML;
+            downloadPdfBtn.disabled = false;
+        }
     });
 
     downloadDocBtn.addEventListener('click', () => {

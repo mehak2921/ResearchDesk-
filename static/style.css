@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --bg-color: #050505;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -1070,53 +1070,245 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
- 
- / *   P r i n t   r u l e s   f o r   P D F   g e n e r a t i o n   * / 
- 
- . r e p o r t - c o n t e n t   p ,   . r e p o r t - c o n t e n t   h 1 ,   . r e p o r t - c o n t e n t   h 2 ,   . r e p o r t - c o n t e n t   h 3 ,   . r e p o r t - c o n t e n t   l i ,   . r e p o r t - c o n t e n t   t r ,   . r e p o r t - c o n t e n t   b l o c k q u o t e   {   p a g e - b r e a k - i n s i d e :   a v o i d ;   b r e a k - i n s i d e :   a v o i d ;   } 
- 
- 
-/* Print rules for PDF generation */
-.report-content p, 
-.report-content h1, 
-.report-content h2, 
-.report-content h3, 
-.report-content li, 
-.report-content tr, 
-.report-content td,
-.report-content blockquote { 
-    page-break-inside: avoid !important; 
-    break-inside: avoid !important; 
+
+/* ========================================================
+   HIGH-FIDELITY PDF EXPORT STYLES (Print & html2pdf)
+   ======================================================== */
+.pdf-render-container {
+    width: 760px !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+    box-sizing: border-box !important;
+    padding: 28px 32px !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-/* PDF Export Styles */
-.pdf-export {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    padding: 20px !important;
+.pdf-header {
+    margin-bottom: 20px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
 }
-.pdf-export * {
-    color: #000000 !important;
+
+.pdf-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
 }
-.pdf-export table {
-    border-collapse: collapse !important;
+
+.pdf-brand-name {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+}
+
+.pdf-badge {
+    background: #e0e7ff !important;
+    color: #4338ca !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+.pdf-report-title {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    margin: 8px 0 10px 0 !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.pdf-meta {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    font-size: 11px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+.pdf-divider {
+    height: 2px !important;
+    background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%) !important;
+    margin: 12px 0 18px 0 !important;
+    border-radius: 2px !important;
+}
+
+.pdf-body-content {
+    color: #334155 !important;
+}
+
+.pdf-body-content h1 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 20px 0 8px 0 !important;
+    padding-bottom: 5px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.pdf-body-content h2 {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 16px 0 8px 0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.pdf-body-content h3 {
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    margin: 14px 0 6px 0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.pdf-body-content p {
+    font-size: 12px !important;
+    color: #334155 !important;
+    line-height: 1.65 !important;
+    margin-bottom: 10px !important;
+}
+
+.pdf-body-content ul, 
+.pdf-body-content ol {
+    margin: 6px 0 12px 20px !important;
+    color: #334155 !important;
+}
+
+.pdf-body-content li {
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 4px !important;
+    color: #334155 !important;
+}
+
+.pdf-body-content strong {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+/* FIX TABLES FOR PDF PRINT: Proper table layout with wrapping */
+.pdf-body-content table {
+    display: table !important;
     width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 14px 0 !important;
+    font-size: 10.5px !important;
+    table-layout: auto !important;
+    white-space: normal !important;
+    page-break-inside: auto !important;
 }
-.pdf-export th, .pdf-export td {
-    border: 1px solid #94a3b8 !important;
-    padding: 8px !important;
+
+.pdf-body-content thead {
+    display: table-header-group !important;
 }
-.pdf-export th {
+
+.pdf-body-content tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.pdf-body-content th {
     background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    padding: 7px 9px !important;
+    border: 1px solid #cbd5e1 !important;
+    text-align: left !important;
+    font-size: 10.5px !important;
 }
-.pdf-export pre, .pdf-export code {
-    background-color: #f8fafc !important;
+
+.pdf-body-content td {
+    padding: 6px 9px !important;
     border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    font-size: 10px !important;
 }
-.pdf-export a {
+
+.pdf-body-content tr:nth-child(even) td {
+    background-color: #f8fafc !important;
+}
+
+.pdf-body-content blockquote {
+    border-left: 4px solid #6366f1 !important;
+    background-color: #f8fafc !important;
+    padding: 8px 14px !important;
+    margin: 10px 0 !important;
+    color: #475569 !important;
+    font-style: italic !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.pdf-body-content pre {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+    font-size: 10px !important;
+    overflow-x: hidden !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    margin: 10px 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.pdf-body-content code {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    font-size: 10.5px !important;
+    font-family: monospace !important;
+}
+
+.pdf-body-content a {
     color: #2563eb !important;
     text-decoration: underline !important;
+    word-break: break-all !important;
 }
+
+.pdf-footer {
+    margin-top: 24px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.pdf-footer .pdf-divider {
+    height: 1px !important;
+    background: #e2e8f0 !important;
+    margin-bottom: 8px !important;
+}
+
+.pdf-footer-text {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 9.5px !important;
+    color: #94a3b8 !important;
+}
+
 
 /* Essential Mobile Fixes for Markdown Content */
 .markdown-body table {

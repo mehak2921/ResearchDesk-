@@ -1,4 +1,4 @@
-﻿# Environments
+# Environments
 .env
 .venv/
 venv/
@@ -29,3 +29,5 @@ temp_env/
 test_env/
 test_install/
 test_clarification.py
+nv api.txt
+*.txt
